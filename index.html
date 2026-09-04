@@ -1,0 +1,706 @@
+<title>裂視</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#100e14;
+  --paper:#ece6d8;
+  --steel:#5b6472;
+  --steel-hi:#7c8798;
+  --lens:#34c9b0;
+  --lens-dim:#1d8a78;
+  --rift:#e0335f;
+  --rift-dim:#8a1f3c;
+  --rift-deep:#22101a;
+  --metal:#211f26;
+  --metal-hi:#332f3a;
+  --text:#ece6d8;
+  --text-dim:#948f9c;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 10%, #1c1822 0%, var(--ink) 55%);
+  color:var(--text);
+  font-family:'Noto Sans TC','Chakra Petch',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+.stage{
+  width:min(94vw,1180px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+
+.visor{
+  position:relative;
+  width:100%;
+  background:linear-gradient(160deg,var(--metal-hi) 0%,var(--metal) 45%,#17151b 100%);
+  border-radius:22px;
+  padding:14px 18px 20px;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.visor::before,.visor::after{
+  content:"";
+  position:absolute;
+  top:42%;
+  width:9%;
+  height:36px;
+  background:linear-gradient(90deg,var(--metal) 0%,var(--metal-hi) 100%);
+  display:none;
+}
+@media(min-width:760px){
+  .visor::before,.visor::after{display:block;}
+  .visor::before{left:-7%;clip-path:polygon(0 40%,100% 0,100% 100%,0 60%);}
+  .visor::after{right:-7%;clip-path:polygon(100% 40%,0 0,0 100%,100% 60%);}
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 4px 10px;
+  font-family:'Chakra Petch',sans-serif;
+  font-size:11px;
+  letter-spacing:.14em;
+  color:var(--text-dim);
+  text-transform:uppercase;
+}
+.topbar .brand{color:var(--lens);font-weight:600;}
+.topbar .brand b{color:var(--text);font-weight:700;}
+.led{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lens);margin-right:6px;box-shadow:0 0 6px var(--lens);animation:blink 2.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+.bars{display:inline-flex;gap:2px;align-items:flex-end;margin-left:10px;}
+.bars span{display:block;width:3px;background:var(--text-dim);}
+.bars span:nth-child(1){height:5px;} .bars span:nth-child(2){height:8px;}
+.bars span:nth-child(3){height:11px;background:var(--lens);} .bars span:nth-child(4){height:14px;background:var(--lens);}
+
+.viewport{
+  position:relative;
+  width:100%;
+  aspect-ratio:960/540;
+  border-radius:10px;
+  overflow:hidden;
+  background:#000;
+  box-shadow:inset 0 0 0 2px #000, inset 0 0 40px rgba(0,0,0,.6);
+}
+canvas{display:block;width:100%;height:100%;}
+
+.bracket{position:absolute;width:22px;height:22px;border-color:var(--lens);opacity:.85;pointer-events:none;filter:drop-shadow(0 0 4px rgba(52,201,176,.5));}
+.bracket.tl{top:10px;left:10px;border-top:2px solid;border-left:2px solid;}
+.bracket.tr{top:10px;right:10px;border-top:2px solid;border-right:2px solid;}
+.bracket.bl{bottom:10px;left:10px;border-bottom:2px solid;border-left:2px solid;}
+.bracket.br{bottom:10px;right:10px;border-bottom:2px solid;border-right:2px solid;}
+.rift-mode .bracket{border-color:var(--rift);filter:drop-shadow(0 0 5px rgba(224,51,95,.6));}
+
+.hud{position:absolute;inset:0;pointer-events:none;font-family:'Chakra Petch',sans-serif;}
+
+.world-badge{
+  position:absolute;top:16px;left:40px;
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px 5px 9px;
+  border:1px solid var(--lens-dim);
+  border-radius:3px;
+  background:rgba(16,14,20,.55);
+  backdrop-filter:blur(2px);
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--lens);
+  transition:border-color .25s,color .25s;
+}
+.world-badge .dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;}
+.rift-mode .world-badge{color:var(--rift);border-color:var(--rift-dim);}
+
+.inventory{position:absolute;top:16px;right:40px;display:flex;gap:8px;}
+.inv-slot{
+  width:34px;height:34px;border-radius:4px;
+  border:1px solid #3a3742;
+  background:rgba(16,14,20,.55);
+  display:flex;align-items:center;justify-content:center;
+  opacity:.35;filter:grayscale(1);
+  transition:opacity .3s,filter .3s,border-color .3s;
+}
+.inv-slot.on{opacity:1;filter:none;border-color:var(--lens-dim);box-shadow:0 0 10px rgba(52,201,176,.25);}
+.inv-slot svg{width:18px;height:18px;}
+
+.hint{
+  position:absolute;left:50%;bottom:22px;transform:translateX(-50%);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:13px;letter-spacing:.02em;
+  color:var(--text);
+  background:rgba(16,14,20,.6);
+  padding:6px 16px;border-radius:20px;
+  border:1px solid #3a3742;
+  opacity:0;transition:opacity .3s;
+  white-space:nowrap;
+}
+.hint.show{opacity:1;}
+
+.collapse-bar{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  width:220px;text-align:center;
+  opacity:0;transition:opacity .3s;
+}
+.collapse-bar.show{opacity:1;}
+.collapse-bar .label{font-size:11px;letter-spacing:.12em;color:var(--rift);text-transform:uppercase;margin-bottom:4px;text-shadow:0 0 6px rgba(224,51,95,.6);}
+.collapse-bar .track{height:5px;border-radius:3px;background:#2b1219;overflow:hidden;border:1px solid var(--rift-dim);}
+.collapse-bar .fill{height:100%;background:linear-gradient(90deg,var(--rift-dim),var(--rift));width:100%;transform-origin:left;}
+
+.deaths{position:absolute;bottom:16px;left:40px;font-size:11px;color:var(--text-dim);letter-spacing:.1em;}
+
+#flash{position:absolute;inset:0;background:var(--rift);opacity:0;pointer-events:none;mix-blend-mode:screen;}
+#toggleflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;}
+
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center, rgba(20,17,24,.97) 0%, rgba(10,9,12,.99) 100%);
+  text-align:center;gap:18px;padding:20px;
+  transition:opacity .5s;
+}
+.screen[hidden]{display:none;}
+.screen .eyebrow{font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.35em;text-transform:uppercase;color:var(--lens-dim);}
+.screen h1{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:clamp(30px,7vw,52px);
+  margin:0;letter-spacing:.03em;
+  color:var(--text);
+  text-wrap:balance;
+}
+.screen h1 .accent{color:var(--lens);}
+.screen p{max-width:420px;font-size:14px;line-height:1.8;color:var(--text-dim);margin:0;}
+.screen .keys{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+.key-chip{
+  font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.05em;
+  border:1px solid #3a3742;border-radius:6px;padding:6px 12px;
+  color:var(--text);background:rgba(255,255,255,.02);
+  display:flex;align-items:center;gap:6px;
+}
+.key-chip b{color:var(--lens);}
+.prompt{
+  margin-top:8px;font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.18em;
+  color:var(--lens);text-transform:uppercase;
+  animation:pulse 1.6s ease-in-out infinite;
+  cursor:pointer;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.stat-row{display:flex;gap:28px;margin-top:6px;}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat .n{font-family:'Chakra Petch',sans-serif;font-size:26px;font-weight:700;color:var(--lens);font-variant-numeric:tabular-nums;}
+.stat .l{font-size:10px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;}
+.restart-btn{
+  font-family:'Chakra Petch',sans-serif;font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--lens-dim);color:var(--lens);
+  padding:10px 26px;border-radius:4px;cursor:pointer;margin-top:6px;
+  transition:background .2s,color .2s;
+}
+.restart-btn:hover{background:var(--lens);color:#0c1512;}
+.restart-btn:focus-visible{outline:2px solid var(--lens);outline-offset:2px;}
+
+.touch{display:none;position:absolute;inset:auto 0 0 0;padding:12px;justify-content:space-between;pointer-events:none;}
+@media(pointer:coarse){.touch{display:flex;}}
+.touch .side{display:flex;gap:10px;pointer-events:auto;}
+.tbtn{
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(20,17,24,.55);border:1px solid #454150;
+  color:var(--text);font-size:20px;display:flex;align-items:center;justify-content:center;
+  font-family:'Chakra Petch',sans-serif;
+}
+.tbtn.wide{width:64px;height:64px;background:rgba(52,201,176,.15);border-color:var(--lens-dim);color:var(--lens);}
+
+.caption{font-family:'Chakra Petch',sans-serif;font-size:10.5px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;text-align:center;opacity:.6;}
+
+.levelnav{display:flex;gap:8px;align-items:center;font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;}
+.levelnav a{color:var(--text-dim);text-decoration:none;padding:2px 4px;}
+.levelnav a.active{color:var(--lens);}
+.levelnav a:hover{color:var(--text);}
+.levelnav .sep{color:#3a3742;}
+.screen-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.next-btn{font-family:'Chakra Petch',sans-serif;font-size:13px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--lens-dim);color:var(--lens);padding:10px 26px;border-radius:4px;cursor:pointer;margin-top:6px;text-decoration:none;display:inline-block;transition:background .2s,color .2s;}
+.next-btn:hover{background:var(--lens);color:#0c1512;}
+</style>
+
+<div class="stage">
+  <div class="levelnav"><a href="index.html" class="active">第一關</a><span class="sep">/</span><a href="https://claude.ai/code/artifact/826e6ee4-05d8-40fe-983b-f7887e8802d7" target="_blank" rel="noopener">第二關</a></div>
+  <div class="visor" id="visor">
+    <div class="topbar">
+      <span class="brand"><span class="led"></span>MODEL–Ø1 <b>// 護目鏡</b></span>
+      <span>訊號同步中<span class="bars"><span></span><span></span><span></span><span></span></span></span>
+    </div>
+    <div class="viewport" id="viewport">
+      <canvas id="game" width="960" height="540"></canvas>
+      <div class="bracket tl"></div><div class="bracket tr"></div>
+      <div class="bracket bl"></div><div class="bracket br"></div>
+
+      <div class="hud">
+        <div class="world-badge" id="worldBadge"><span class="dot"></span><span id="worldLabel">正常空間</span></div>
+        <div class="inventory">
+          <div class="inv-slot" id="invGoggles" title="護目鏡">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="12" r="4.2"/><circle cx="17" cy="12" r="4.2"/><path d="M11 12h2M2.5 9 5 8M21.5 9 19 8"/></svg>
+          </div>
+          <div class="inv-slot" id="invKey" title="鑰匙">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.4"/><path d="m10.4 10.4 9.6 9.6M16 15l2.2-2.2M18.6 17.6l2.2-2.2"/></svg>
+          </div>
+        </div>
+        <div class="collapse-bar" id="collapseBar">
+          <div class="label">地板鬆動 // 撤離</div>
+          <div class="track"><div class="fill" id="collapseFill"></div></div>
+        </div>
+        <div class="hint" id="hint"></div>
+        <div class="deaths" id="deathCounter">重置 · 0</div>
+      </div>
+
+      <div id="flash"></div>
+      <div id="toggleflash"></div>
+
+      <div class="screen" id="bootScreen">
+        <div class="eyebrow">SIGNAL LOCK — 第一關</div>
+        <h1>戴上<span class="accent">護目鏡</span>之前</h1>
+        <p>你被鎖在一個密閉房間裡。牆上掛著一副護目鏡——啟動它，世界會裂成兩層：你所站的地方，與另一層破碎的空間。切換視野，就是唯一的出路。</p>
+        <div class="keys">
+          <span class="key-chip"><b>◀ ▶</b> / A D 移動</span>
+          <span class="key-chip"><b>▲</b> / W / Space 跳躍</span>
+          <span class="key-chip"><b>E</b> 切換空間</span>
+        </div>
+        <div class="prompt" id="startPrompt">按任意鍵啟動護目鏡</div>
+      </div>
+
+      <div class="screen" id="winScreen" hidden>
+        <div class="eyebrow">RIFT SEALED</div>
+        <h1>第一關 <span class="accent">過關</span></h1>
+        <p>地板在你身後徹底崩塌，但你已經穿過裂縫，站到了門的另一側。</p>
+        <div class="stat-row">
+          <div class="stat"><span class="n" id="statTime">00:00</span><span class="l">用時</span></div>
+          <div class="stat"><span class="n" id="statDeaths">0</span><span class="l">重置次數</span></div>
+        </div>
+        <div class="screen-btns">
+          <button class="restart-btn" id="restartBtn">重新挑戰</button>
+          <a class="next-btn" href="https://claude.ai/code/artifact/826e6ee4-05d8-40fe-983b-f7887e8802d7" target="_blank" rel="noopener">前往第二關</a>
+        </div>
+      </div>
+
+      <div class="touch">
+        <div class="side">
+          <div class="tbtn" id="tLeft">◀</div>
+          <div class="tbtn" id="tRight">▶</div>
+        </div>
+        <div class="side">
+          <div class="tbtn wide" id="tToggle">◐</div>
+          <div class="tbtn wide" id="tJump">▲</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">裂視 — 護目鏡切換正常空間 / 異空間的跑酷原型 · 第一關</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const VW=960, VH=540, LEVEL_WIDTH=3480;
+const GRAVITY=0.55, MAX_FALL=15, MOVE_ACCEL=0.85, MAX_SPEED=4.3, FRICTION=0.82, JUMP_V=-11.6;
+
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const visorEl=document.getElementById('visor');
+const worldLabel=document.getElementById('worldLabel');
+const invGoggles=document.getElementById('invGoggles');
+const invKey=document.getElementById('invKey');
+const hintEl=document.getElementById('hint');
+const collapseBar=document.getElementById('collapseBar');
+const collapseFill=document.getElementById('collapseFill');
+const deathCounter=document.getElementById('deathCounter');
+const flashEl=document.getElementById('flash');
+const toggleFlashEl=document.getElementById('toggleflash');
+const bootScreen=document.getElementById('bootScreen');
+const winScreen=document.getElementById('winScreen');
+const restartBtn=document.getElementById('restartBtn');
+
+function rectsOverlap(a,b){return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;}
+
+function buildLevel(){
+  return [
+    {x:0,y:480,w:470,h:60,world:'both'},
+    {x:440,y:200,w:34,h:280,world:'normal',id:'wall1'},
+    {x:560,y:460,w:110,h:18,world:'normal'},
+    {x:720,y:400,w:110,h:18,world:'abnormal'},
+    {x:880,y:440,w:110,h:18,world:'normal'},
+    {x:1040,y:360,w:110,h:18,world:'abnormal'},
+    {x:1200,y:420,w:110,h:18,world:'normal'},
+    {x:1360,y:340,w:110,h:18,world:'abnormal'},
+    {x:1520,y:400,w:110,h:18,world:'normal'},
+    {x:1680,y:300,w:160,h:18,world:'both'},
+    {x:1880,y:380,w:110,h:18,world:'abnormal'},
+    {x:2040,y:320,w:110,h:18,world:'normal'},
+    {x:2200,y:260,w:120,h:18,world:'abnormal'},
+    {x:2360,y:240,w:150,h:18,world:'both',id:'r3entry'},
+    {x:2560,y:280,w:120,h:18,world:'abnormal',room3:true},
+    {x:2720,y:220,w:120,h:18,world:'abnormal',room3:true},
+    {x:2880,y:300,w:120,h:18,world:'abnormal',room3:true},
+    {x:3040,y:240,w:120,h:18,world:'abnormal',room3:true},
+    {x:3200,y:290,w:190,h:18,world:'both',id:'exit'},
+  ];
+}
+
+let platforms, goggles, key, player, currentWorld, hasGoggles, hasKey;
+let collapseActive, collapseTimer, deaths, checkpoint, gameState, elapsed, startTime;
+let heldLeft=false, heldRight=false, camX=0, hintTimer=0, blockedShakeT=0, particles=[];
+
+function resetAll(){
+  platforms=buildLevel();
+  goggles={x:380,y:428,w:32,h:34,collected:false};
+  key={x:3095,y:160,w:26,h:26,collected:false};
+  player={x:60,y:400,w:30,h:48,vx:0,vy:0,onGround:false,facing:1};
+  currentWorld='normal';
+  hasGoggles=false; hasKey=false;
+  collapseActive=false; collapseTimer=0;
+  deaths=0;
+  checkpoint={id:'room1',x:60,y:400};
+  particles=[];
+  for(let i=0;i<40;i++) particles.push({x:Math.random()*LEVEL_WIDTH,y:Math.random()*VH,r:Math.random()*1.6+.4,ph:Math.random()*Math.PI*2});
+  updateHUD();
+  hideHint();
+}
+
+function activeSolids(world){
+  return platforms.filter(p=>!p.collapsed && (p.world===world||p.world==='both'));
+}
+
+function showHint(text,ms){
+  hintEl.textContent=text;
+  hintEl.classList.add('show');
+  hintTimer=ms||1800;
+}
+function hideHint(){hintEl.classList.remove('show');}
+
+function updateHUD(){
+  worldLabel.textContent = currentWorld==='normal' ? '正常空間' : '異空間';
+  visorEl.classList.toggle('rift-mode', currentWorld==='abnormal');
+  invGoggles.classList.toggle('on', hasGoggles);
+  invKey.classList.toggle('on', hasKey);
+  deathCounter.textContent = '重置 · '+deaths;
+}
+
+function attemptToggle(){
+  if(gameState!=='playing') return;
+  if(!hasGoggles){ showHint('先撿起護目鏡',1400); return; }
+  const target = currentWorld==='normal' ? 'abnormal' : 'normal';
+  const solids = activeSolids(target);
+  const blocked = solids.some(p=>rectsOverlap(player,p));
+  if(blocked){
+    blockedShakeT=260;
+    flashEl.style.transition='none'; flashEl.style.opacity='.35';
+    requestAnimationFrame(()=>{flashEl.style.transition='opacity .3s'; flashEl.style.opacity='0';});
+    showHint('此處無法切換空間',1200);
+    return;
+  }
+  currentWorld=target;
+  toggleFlashEl.style.transition='none'; toggleFlashEl.style.opacity='.5';
+  requestAnimationFrame(()=>{toggleFlashEl.style.transition='opacity .35s'; toggleFlashEl.style.opacity='0';});
+  updateHUD();
+}
+
+function resetRoom3(){
+  platforms.forEach(p=>{ if(p.room3) p.collapsed=false; });
+  collapseActive=false; collapseTimer=0;
+  if(hasKey) startCollapse();
+}
+
+function startCollapse(){
+  collapseActive=true;
+  collapseTimer=5200;
+  showHint('地板開始鬆動！快逃！',2200);
+}
+
+function respawn(){
+  deaths++;
+  player.x=checkpoint.x; player.y=checkpoint.y; player.vx=0; player.vy=0;
+  if(checkpoint.id==='room3') resetRoom3();
+  updateHUD();
+}
+
+function updateCheckpoints(){
+  if(player.x>470 && checkpoint.id==='room1') checkpoint={id:'room2',x:500,y:380};
+  else if(player.x>1760 && checkpoint.id==='room2') checkpoint={id:'mid',x:1720,y:260};
+  else if(player.x>2360 && checkpoint.id!=='room3') checkpoint={id:'room3',x:2390,y:180};
+}
+
+function triggerWin(){
+  gameState='won';
+  elapsed=(performance.now()-startTime)/1000;
+  const m=Math.floor(elapsed/60), s=Math.floor(elapsed%60);
+  document.getElementById('statTime').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('statDeaths').textContent=deaths;
+  winScreen.hidden=false;
+}
+
+const keys={left:false,right:false};
+window.addEventListener('keydown',e=>{
+  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
+  if(gameState==='boot'){ startGame(); return; }
+  if(gameState!=='playing') return;
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') keys.left=true;
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right=true;
+  if(!e.repeat && (e.key==='ArrowUp'||e.key==='w'||e.key==='W'||e.key===' ')){
+    if(player.onGround){ player.vy=JUMP_V; player.onGround=false; }
+  }
+  if(!e.repeat && (e.key==='e'||e.key==='E')) attemptToggle();
+},{passive:false});
+window.addEventListener('keyup',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') keys.left=false;
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right=false;
+});
+
+function bindTouch(id,onDown,onUp){
+  const el=document.getElementById(id);
+  el.addEventListener('pointerdown',e=>{e.preventDefault(); onDown();});
+  el.addEventListener('pointerup',e=>{e.preventDefault(); onUp&&onUp();});
+  el.addEventListener('pointerleave',()=>{onUp&&onUp();});
+}
+bindTouch('tLeft',()=>keys.left=true,()=>keys.left=false);
+bindTouch('tRight',()=>keys.right=true,()=>keys.right=false);
+bindTouch('tJump',()=>{ if(gameState==='boot'){startGame();return;} if(player.onGround){player.vy=JUMP_V;player.onGround=false;} });
+bindTouch('tToggle',()=>{ if(gameState==='boot'){startGame();return;} attemptToggle(); });
+
+document.getElementById('startPrompt').addEventListener('click',startGame);
+restartBtn.addEventListener('click',()=>{ resetAll(); winScreen.hidden=true; gameState='playing'; startTime=performance.now(); });
+
+function startGame(){
+  if(gameState!=='boot') return;
+  gameState='playing';
+  startTime=performance.now();
+  bootScreen.hidden=true;
+}
+
+function physics(){
+  if(gameState!=='playing') return;
+  let ax=0;
+  if(keys.left){ ax-=MOVE_ACCEL; player.facing=-1; }
+  if(keys.right){ ax+=MOVE_ACCEL; player.facing=1; }
+  player.vx+=ax;
+  if(!ax) player.vx*=FRICTION;
+  player.vx=Math.max(-MAX_SPEED,Math.min(MAX_SPEED,player.vx));
+  if(Math.abs(player.vx)<0.03) player.vx=0;
+
+  player.vy+=GRAVITY;
+  if(player.vy>MAX_FALL) player.vy=MAX_FALL;
+
+  const solids=activeSolids(currentWorld);
+
+  player.x+=player.vx;
+  if(player.x<0) player.x=0;
+  for(const p of solids){
+    if(rectsOverlap(player,p)){
+      if(player.vx>0) player.x=p.x-player.w;
+      else if(player.vx<0) player.x=p.x+p.w;
+      player.vx=0;
+    }
+  }
+
+  player.y+=player.vy;
+  player.onGround=false;
+  for(const p of solids){
+    if(rectsOverlap(player,p)){
+      if(player.vy>0){ player.y=p.y-player.h; player.onGround=true; }
+      else if(player.vy<0){ player.y=p.y+p.h; }
+      player.vy=0;
+    }
+  }
+
+  if(!goggles.collected && rectsOverlap(player,goggles)){
+    goggles.collected=true; hasGoggles=true;
+    showHint('已取得護目鏡 — 按 E 啟動',2400);
+    updateHUD();
+  }
+  if(!key.collected && rectsOverlap(player,key)){
+    key.collected=true; hasKey=true;
+    updateHUD();
+    startCollapse();
+  }
+
+  updateCheckpoints();
+
+  if(player.y>620){ respawn(); }
+  if(player.x>3355 && checkpoint.id==='room3'){ triggerWin(); }
+
+  if(collapseActive){
+    collapseTimer-=16.7;
+    const pct=Math.max(0,collapseTimer/5200);
+    collapseFill.style.transform='scaleX('+pct+')';
+    collapseBar.classList.add('show');
+    if(collapseTimer<=0){
+      collapseActive=false;
+      platforms.forEach(p=>{ if(p.room3) p.collapsed=true; });
+    }
+  } else {
+    collapseBar.classList.remove('show');
+  }
+
+  if(hintTimer>0){ hintTimer-=16.7; if(hintTimer<=0) hideHint(); }
+  if(blockedShakeT>0) blockedShakeT-=16.7;
+
+  camX=Math.max(0,Math.min(player.x-VW/2, LEVEL_WIDTH-VW));
+}
+
+function drawBackground(t){
+  const abnormal=currentWorld==='abnormal';
+  const g=ctx.createLinearGradient(0,0,0,VH);
+  if(abnormal){
+    g.addColorStop(0,'#1b0d15'); g.addColorStop(1,'#2a0f1a');
+  } else {
+    g.addColorStop(0,'#2a2c33'); g.addColorStop(1,'#17181c');
+  }
+  ctx.fillStyle=g; ctx.fillRect(0,0,VW,VH);
+
+  ctx.save();
+  for(const pt of particles){
+    const sx=pt.x-camX;
+    if(sx<-10||sx>VW+10) continue;
+    const flick=0.4+0.4*Math.sin(t*0.001+pt.ph);
+    ctx.globalAlpha=flick*(abnormal?0.9:0.35);
+    ctx.fillStyle=abnormal?'#e0335f':'#8fa2ad';
+    ctx.beginPath(); ctx.arc(sx,pt.y,pt.r,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+
+  if(abnormal){
+    ctx.save();
+    ctx.strokeStyle='rgba(224,51,95,0.10)'; ctx.lineWidth=1;
+    for(let i=0;i<6;i++){
+      const yy=(i*97+((t*0.02)%97));
+      ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(VW,yy+6); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+function drawPlatform(p){
+  const sx=p.x-camX;
+  if(sx+p.w<0||sx>VW) return;
+  const abnormal = p.world==='abnormal';
+  const both = p.world==='both';
+  ctx.save();
+  if(p.room3 && collapseActive){
+    const shake=(1-collapseTimer/5200)*3;
+    ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
+  }
+  let top,body,edge;
+  if(both){ top=p.id==='exit'?'#8fe3d3':'#cfd6da'; body='#3f4650'; edge=var_lens(); }
+  else if(abnormal){ top='#ff7a95'; body='#5c1a2c'; edge='#e0335f'; }
+  else { top='#eef1f0'; body='#4b5561'; edge='#93a0ab'; }
+
+  ctx.fillStyle=body;
+  ctx.fillRect(sx,p.y,p.w,p.h);
+  ctx.fillStyle=top;
+  ctx.fillRect(sx,p.y,p.w,3);
+  ctx.strokeStyle=edge; ctx.lineWidth=1; ctx.globalAlpha=.6;
+  ctx.strokeRect(sx+0.5,p.y+0.5,p.w-1,p.h-1);
+  ctx.globalAlpha=1;
+
+  if(p.id==='wall1'){
+    ctx.fillStyle='rgba(255,255,255,.05)';
+    for(let i=0;i<4;i++) ctx.fillRect(sx+4,p.y+10+i*(p.h-20)/4,p.w-8,4);
+  }
+  if(p.room3){
+    ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.beginPath();
+    ctx.moveTo(sx+p.w*0.3,p.y); ctx.lineTo(sx+p.w*0.45,p.y+p.h);
+    ctx.moveTo(sx+p.w*0.7,p.y); ctx.lineTo(sx+p.w*0.6,p.y+p.h);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function var_lens(){return '#34c9b0';}
+
+function drawItem(it,type){
+  if(it.collected) return;
+  const sx=it.x-camX;
+  if(sx+it.w<0||sx>VW) return;
+  const bob=Math.sin(performance.now()*0.004)*3;
+  ctx.save();
+  ctx.translate(sx+it.w/2,it.y+it.h/2+bob);
+  if(type==='goggles'){
+    ctx.strokeStyle='#34c9b0'; ctx.fillStyle='rgba(52,201,176,.18)'; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.ellipse(-8,0,7,8,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(8,0,7,8,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-2,0); ctx.lineTo(2,0); ctx.stroke();
+  } else {
+    ctx.strokeStyle='#e6c14a'; ctx.fillStyle='rgba(230,193,74,.18)'; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.arc(-4,-6,6,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(9,7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(5,3); ctx.lineTo(5,8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8,6); ctx.lineTo(8,10); ctx.stroke();
+  }
+  ctx.shadowColor= type==='goggles' ? '#34c9b0' : '#e6c14a';
+  ctx.shadowBlur=10;
+  ctx.restore();
+}
+
+function drawPlayer(){
+  const sx=player.x-camX;
+  const abnormal=currentWorld==='abnormal';
+  ctx.save();
+  ctx.translate(sx,player.y);
+  ctx.fillStyle= abnormal ? '#3a1520' : '#2b2e34';
+  ctx.strokeStyle= abnormal ? '#e0335f' : '#93a0ab';
+  ctx.lineWidth=1.4;
+  roundRect(ctx,2,4,player.w-4,player.h-8,6);
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle='#d8cdb8';
+  ctx.beginPath(); ctx.arc(player.w/2,10,8,0,Math.PI*2); ctx.fill();
+
+  if(hasGoggles){
+    ctx.fillStyle='#34c9b0';
+    ctx.shadowColor='#34c9b0'; ctx.shadowBlur=6;
+    const gx= player.facing>0 ? player.w/2+1 : player.w/2-5;
+    ctx.fillRect(gx,7,5,4);
+    ctx.shadowBlur=0;
+  }
+  ctx.restore();
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r);
+  c.arcTo(x,y,x+w,y,r);
+  c.closePath();
+}
+
+function render(t){
+  ctx.save();
+  if(blockedShakeT>0){
+    ctx.translate((Math.random()-0.5)*6,(Math.random()-0.5)*6);
+  }
+  drawBackground(t);
+  for(const p of activeSolids(currentWorld)) drawPlatform(p);
+  drawItem(goggles,'goggles');
+  drawItem(key,'key');
+  drawPlayer();
+  ctx.restore();
+}
+
+let last=performance.now();
+function loop(t){
+  const dt=t-last; last=t;
+  physics();
+  render(t);
+  requestAnimationFrame(loop);
+}
+
+gameState='boot';
+resetAll();
+requestAnimationFrame(loop);
+})();
+</script>
