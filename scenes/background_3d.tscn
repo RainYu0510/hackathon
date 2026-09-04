@@ -1,0 +1,172 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/background_3d.gd" id="1_bg"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_unit"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="Environment" id="Environment_bg"]
+background_mode = 1
+background_color = Color(0.07, 0.09, 0.15, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.28, 0.33, 0.48, 1)
+ambient_light_energy = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_LayerFar"]
+albedo_color = Color(0.160, 0.190, 0.300, 1)
+roughness = 0.95
+metallic = 0.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_LayerMid"]
+albedo_color = Color(0.200, 0.240, 0.360, 1)
+roughness = 0.95
+metallic = 0.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_LayerNear"]
+albedo_color = Color(0.110, 0.130, 0.210, 1)
+roughness = 0.95
+metallic = 0.0
+
+[node name="Background3D" type="Node3D"]
+script = ExtResource("1_bg")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+fov = 60.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 30, 20)
+light_color = Color(1, 0.95, 0.86, 1)
+light_energy = 1.1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_bg")
+
+[node name="LayerFar" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -60.0)
+
+[node name="Box0" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(13.563, 0, 0, 0, 43.932, 0, 0, 0, 10.830, -67.947, -12.034, -1.015)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box1" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(8.115, 0, 0, 0, 42.142, 0, 0, 0, 9.249, -52.439, -12.929, 0.973)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box2" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(11.136, 0, 0, 0, 26.252, 0, 0, 0, 7.195, -39.159, -20.874, 0.719)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box3" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(21.268, 0, 0, 0, 27.209, 0, 0, 0, 27.645, -28.875, -20.395, -1.786)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box4" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(13.742, 0, 0, 0, 25.989, 0, 0, 0, 10.208, -11.836, -21.006, 0.581)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box5" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(16.115, 0, 0, 0, 47.980, 0, 0, 0, 10.824, 2.449, -10.010, 1.006)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box6" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(19.245, 0, 0, 0, 18.373, 0, 0, 0, 23.932, 12.338, -24.813, -1.804)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box7" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(20.300, 0, 0, 0, 33.576, 0, 0, 0, 25.196, 28.450, -17.212, 1.198)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box8" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(11.514, 0, 0, 0, 26.284, 0, 0, 0, 15.674, 38.850, -20.858, -1.612)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box9" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(12.743, 0, 0, 0, 31.915, 0, 0, 0, 12.744, 50.898, -18.043, -0.640)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="Box10" type="MeshInstance3D" parent="LayerFar"]
+transform = Transform3D(14.059, 0, 0, 0, 38.754, 0, 0, 0, 12.451, 68.322, -14.623, -1.206)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerFar")
+
+[node name="LayerMid" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -30.0)
+
+[node name="Box0" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(7.188, 0, 0, 0, 11.959, 0, 0, 0, 4.732, -32.987, -12.020, -0.837)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box1" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(5.257, 0, 0, 0, 24.971, 0, 0, 0, 5.985, -24.279, -5.515, 1.534)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box2" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(9.538, 0, 0, 0, 22.272, 0, 0, 0, 11.473, -13.954, -6.864, 1.402)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box3" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(12.382, 0, 0, 0, 17.075, 0, 0, 0, 7.740, -6.488, -9.462, -0.799)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box4" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(10.055, 0, 0, 0, 22.264, 0, 0, 0, 12.917, 6.941, -6.868, -1.253)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box5" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(9.155, 0, 0, 0, 23.225, 0, 0, 0, 6.705, 13.959, -6.387, -1.674)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box6" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(6.671, 0, 0, 0, 10.310, 0, 0, 0, 5.224, 21.620, -12.845, 1.527)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="Box7" type="MeshInstance3D" parent="LayerMid"]
+transform = Transform3D(12.505, 0, 0, 0, 16.319, 0, 0, 0, 11.132, 31.422, -9.840, -1.964)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerMid")
+
+[node name="LayerNear" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15.0)
+
+[node name="Box0" type="MeshInstance3D" parent="LayerNear"]
+transform = Transform3D(8.798, 0, 0, 0, 6.147, 0, 0, 0, 6.931, -16.557, -6.927, 1.649)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerNear")
+
+[node name="Box1" type="MeshInstance3D" parent="LayerNear"]
+transform = Transform3D(7.156, 0, 0, 0, 9.438, 0, 0, 0, 5.919, -10.246, -5.281, 1.512)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerNear")
+
+[node name="Box2" type="MeshInstance3D" parent="LayerNear"]
+transform = Transform3D(5.531, 0, 0, 0, 13.561, 0, 0, 0, 6.624, -2.045, -3.220, 0.591)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerNear")
+
+[node name="Box3" type="MeshInstance3D" parent="LayerNear"]
+transform = Transform3D(8.303, 0, 0, 0, 7.871, 0, 0, 0, 9.096, 7.490, -6.065, 0.721)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerNear")
+
+[node name="Box4" type="MeshInstance3D" parent="LayerNear"]
+transform = Transform3D(3.572, 0, 0, 0, 11.890, 0, 0, 0, 4.563, 17.650, -4.055, 0.278)
+mesh = SubResource("BoxMesh_unit")
+surface_material_override/0 = SubResource("Mat_LayerNear")

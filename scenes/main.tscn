@@ -1,0 +1,75 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/background_3d.tscn" id="2_bg"]
+[ext_resource type="Script" path="res://scripts/level.gd" id="3_level"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
+[ext_resource type="Script" path="res://scripts/shared_camera.gd" id="5_camera"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Compositor" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="BackgroundView" type="TextureRect" parent="Compositor"]
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="GameplayView" type="TextureRect" parent="Compositor"]
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="BgViewport" type="SubViewport" parent="."]
+own_world_3d = true
+transparent_bg = false
+handle_input_locally = false
+size = Vector2i(480, 270)
+render_target_update_mode = 4
+
+[node name="Background3D" parent="BgViewport" instance=ExtResource("2_bg")]
+
+[node name="GameViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(480, 270)
+render_target_update_mode = 4
+
+[node name="Level" type="Node2D" parent="GameViewport"]
+script = ExtResource("3_level")
+
+[node name="Platforms" type="Node2D" parent="GameViewport/Level"]
+
+[node name="Player1" parent="GameViewport/Level" instance=ExtResource("4_player")]
+input_prefix = &"p1"
+body_color = Color(0.9, 0.38, 0.32, 1)
+
+[node name="Player2" parent="GameViewport/Level" instance=ExtResource("4_player")]
+position = Vector2(140, 0)
+input_prefix = &"p2"
+body_color = Color(0.36, 0.7, 0.92, 1)
+
+[node name="SharedCamera" type="Camera2D" parent="GameViewport/Level"]
+process_physics_priority = 10
+zoom = Vector2(0.25, 0.25)
+process_callback = 0
+position_smoothing_enabled = false
+limit_left = -10000000
+limit_top = -10000000
+limit_right = 10000000
+limit_bottom = 10000000
+script = ExtResource("5_camera")
