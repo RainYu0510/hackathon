@@ -14,7 +14,19 @@ const LOGICAL_SIZE := Vector2i(1920, 1080)
 ##   1 -> 1920x1080   2 -> 960x540   3 -> 640x360   4 -> 480x270   6 -> 320x180
 ## 兩個 SubViewport 的像素數會跟著變,但相機 zoom 同步補償,
 ## 所以可視世界永遠是 1920x1080,half_w 恆為 960。
-@export_range(1, 8, 1) var render_divisor: int = 4
+##
+## **但它跟玩家貼圖是綁在一起的。** 角色在螢幕上的高度 = 88 / render_divisor,
+## 而貼圖必須用同樣的比例產出才會是像素對齊的。改這個值就要一起改:
+##   1. tools/make_spritesheet.py 的 --height,值 = 88 / render_divisor
+##   2. scenes/player.tscn 裡 AnimatedSprite2D 的 scale,值 = render_divisor
+## 三者不一致時 Player._ready() 會 push_error 擋下來,不會靜默畫錯。
+##
+## 可用值只有 {1, 2, 4, 8}:必須同時整除 88(角色高)與 1920/1080(畫面),
+## 否則貼圖對不齊像素格。3 和 6 雖然整除畫面,但 88/3、88/6 不是整數。
+##
+## 從 4 改成 2 的理由:4 時角色只有 22px 高,這隻貓的細節量(墨鏡、球鞋、
+## 連帽衫)在那個尺寸下糊成一團,辨識不出來。
+@export_range(1, 8, 1) var render_divisor: int = 2
 
 @onready var _bg_viewport: SubViewport = $BgViewport
 @onready var _game_viewport: SubViewport = $GameViewport

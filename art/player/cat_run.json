@@ -1,0 +1,19 @@
+{
+  "source": "art/source/cat_run_sheet.png",
+  "frames": 8,
+  "cell_width": 40,
+  "cell_height": 46,
+  "character_height": 44,
+  "bg_threshold": 4,
+  "baseline_from_bottom": 1,
+  "generated_by": "tools/make_spritesheet.py",
+  "argv": [
+    "art/source/cat_run_sheet.png",
+    "--out",
+    "art/player/cat_run",
+    "--height",
+    "44",
+    "--godot-frames",
+    "art/player/player_frames.tres"
+  ]
+}

@@ -56,12 +56,12 @@ script = ExtResource("3_level")
 
 [node name="Player1" parent="GameViewport/Level" instance=ExtResource("4_player")]
 input_prefix = &"p1"
-body_color = Color(0.9, 0.38, 0.32, 1)
+tint = Color(1, 1, 1, 1)
 
 [node name="Player2" parent="GameViewport/Level" instance=ExtResource("4_player")]
 position = Vector2(140, 0)
 input_prefix = &"p2"
-body_color = Color(0.36, 0.7, 0.92, 1)
+tint = Color(0.45, 0.72, 1, 1)
 
 [node name="SharedCamera" type="Camera2D" parent="GameViewport/Level"]
 process_physics_priority = 10

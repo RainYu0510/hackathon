@@ -27,9 +27,13 @@ const MAX_GAP := 350.0
 const JUMP_HEIGHT := 300.5
 
 const PLATFORM_COLOR := Color(0.30, 0.34, 0.42)
-const PLAYER_COLORS: Array[Color] = [
-	Color(0.90, 0.38, 0.32),   # P1 — WASD
-	Color(0.36, 0.70, 0.92),   # P2 — 方向鍵
+## 兩個玩家共用同一份貓貼圖,靠 modulate 相乘染色區分。
+## P1 用白色 = 不染,保留美術原色;P2 染藍,沿用舊配色裡的那個藍。
+## 相乘染色在黑貓身上只吃得到亮部(連帽衫、球鞋、墨鏡),黑色身體不受影響 ——
+## 這反而是好事:兩隻貓的剪影一致,只有配色不同。
+const PLAYER_TINTS: Array[Color] = [
+	Color.WHITE,               # P1 — 原色
+	Color(0.45, 0.72, 1.00),   # P2 — 染藍
 ]
 
 var bounds: Rect2
@@ -235,9 +239,9 @@ func _place_players() -> void:
 			# 把 last_grounded_position 設成 .tscn 裡的位置了。teleport_to()
 			# 會一併更新,直接寫 position 不會,鏡頭的垂直參考點就會留在舊值。
 			p.teleport_to(spawn_points[i])
-		# 用方法而不是直接寫 body_color:Player._ready() 已經跑完了,
-		# 再寫那個 export 只會改到變數,ColorRect 不會跟著更新。
-		p.set_body_color(PLAYER_COLORS[i % PLAYER_COLORS.size()])
+		# 用方法而不是直接寫 tint:Player._ready() 已經跑完了,
+		# 再寫那個 export 只會改到變數,AnimatedSprite2D 不會跟著更新。
+		p.set_tint(PLAYER_TINTS[i % PLAYER_TINTS.size()])
 
 
 # ──────────────────────────────────────────────────────────────
