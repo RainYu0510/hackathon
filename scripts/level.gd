@@ -271,28 +271,36 @@ func _physics_process(_delta: float) -> void:
 	# 架構約束 1:一律輪詢 Input singleton。
 	# 這個節點在裸掛的 SubViewport 底下,_unhandled_input() 永遠不會被呼叫。
 	if Input.is_action_just_pressed(&"debug_restart"):
-		_reset_all()
+		_reset_all("R 鍵")
 
 	_guard_out_of_bounds()
 
 
-## R 鍵:兩人回出生點,鏡頭直接 snap(不平滑)。
-func _reset_all() -> void:
+## 兩人一起回出生點,鏡頭直接 snap(不平滑)。R 鍵與出界重生共用這一條路徑。
+func _reset_all(reason: String) -> void:
 	for i: int in _players.size():
 		if i < spawn_points.size():
 			_players[i].teleport_to(spawn_points[i])
 	_camera.snap_to_target()
-	print("[Level] 重置")
+	print("[Level] 重置(%s)" % reason)
 
 
-## 出界防護:掉到 bounds 下緣以外就送回「最近的安全落腳點」。
+## 出界防護:任何一人掉到 bounds 下緣以外,「兩個人」一起回出生點。
 ##
-## N4 —— 刻意不送回出生點。鏡頭是 trail_x = min(p1.x, p2.x) 驅動的,
-## 把落後的人瞬移回起點會讓 trail_x 暴跌,鏡頭一路滑回開頭,還在前面的
-## 另一個玩家就被推出畫面 —— 直接違反「永不把落後者推出畫面」。
-## 那不是鏡頭的錯,是重生點的選擇讓規格不可能被滿足,所以修重生點。
+## N4 當初的處置是「回最近的安全落腳點」,理由是鏡頭由
+## trail_x = min(p1.x, p2.x) 驅動 —— 只把一個人送回起點會讓 trail_x 暴跌、
+## 鏡頭一路滑回開頭,還在前面的另一個玩家被推出畫面,違反「永不把落後者
+## 推出畫面」。
+##
+## 改成兩人一起回之後,那個衝突不存在了:沒有人留在遠處,鏡頭 snap 一次
+## 就位,鏡頭規格仍然成立。這是 owner 拍板的設計決定 —— 一個人失誤兩個人
+## 一起回去,是刻意的合作壓力,不是副作用。
+##
+## 連帶:出界與 R 鍵現在是同一個行為,`last_grounded_position` 不再兼任
+## 重生點,只服務鏡頭的垂直參考點。
 func _guard_out_of_bounds() -> void:
 	var floor_y := bounds.end.y
 	for p: Player in _players:
 		if p.global_position.y > floor_y:
-			p.teleport_to(p.last_grounded_position)
+			_reset_all("出界")
+			return

@@ -127,9 +127,10 @@ SubViewport 尺寸 → 相機 zoom → ViewportTexture → 訊號 → `level.act
   未型別容器——未型別容器索引出來的型別對編譯器而言永遠是
   `Variant`。如果需要跟回傳未型別 `Array` 的既有 Godot 引擎函式介接，
   用 `.assign()` 或逐筆明確轉型，不要整個賦值繞過型別檢查。
-- 同一份狀態不要開兩個欄位。例如 `last_grounded_position` 同時服務鏡頭的
-  垂直參考點與出界重生點，就只開一個，不要另外再開一個
-  `last_grounded_y`——兩份會走鐘。
+- 同一份狀態不要開兩個欄位。例如 `last_grounded_position` 就只開一個
+  `Vector2`,不要另外再開一個 `last_grounded_y`——兩份會走鐘。
+  (它原本同時服務鏡頭的垂直參考點與出界重生點;重生改成「兩人一起回出生
+  點」之後只剩鏡頭這一個用途,但規則本身不變。)
 
 ## 資料外部化
 

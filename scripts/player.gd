@@ -18,14 +18,19 @@ class_name Player
 @export var coyote_time: float = 0.1
 
 ## 由 Level 在 add_child() 之前設定(架構約束 2:父推子)。
+## p1 = WASD;p2 = IJKL(外加數字鍵盤 4/6/8)。
+## p2 不用方向鍵:實測這台鍵盤 W + ↑ + → 三顆同時會被矩陣封鎖掉,
+## 詳見 dev-log 的 rollover 實測表。
 @export var input_prefix: StringName = &"p1"
 @export var body_color: Color = Color(0.90, 0.38, 0.32)
 
-## 最後一次踩在地板上的位置。同時服務兩件事,刻意不開兩個欄位:
-##   1. SharedCamera 的垂直參考點(跳躍時鏡頭不跟著抖)
-##   2. 出界重生點(N4:回出生點會把另一個玩家推出畫面)
+## 最後一次踩在地板上的位置。SharedCamera 拿它的 y 當垂直參考點,
+## 讓跳躍時鏡頭不跟著上下抖。
 ## 初始值 = 出生點,不是 Vector2.ZERO —— 否則第一幀還沒落地時鏡頭
 ## 的垂直參考點是 0,鏡頭會被拉到關卡上緣。
+##
+## 這個欄位原本還兼任出界重生點(N4)。重生改成「兩人一起回出生點」之後
+## 那個用途沒了,欄位保留是因為鏡頭仍然需要它。
 var last_grounded_position: Vector2 = Vector2.ZERO
 
 var _action_left: StringName

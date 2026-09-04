@@ -44,7 +44,7 @@
 | `scenes/player.tscn` | CharacterBody2D 60x88,layer 2 / mask 1 |
 | `scenes/background_3d.tscn` | 三層方塊共 24 個 MeshInstance3D + BoxMesh |
 | `scripts/main.gd` | **唯一的初始化排序點**。尺寸→zoom→貼圖→訊號→放行 |
-| `scripts/level.gd` | 讀 JSON、生平台、缺口斷言、落差表、R 鍵、出界防護 |
+| `scripts/level.gd` | 讀 JSON、生平台、缺口斷言、落差表、R 鍵、出界防護(兩人一起回出生點) |
 | `scripts/player.gd` | 控制器,`input_prefix` 區分兩人,coyote time |
 | `scripts/shared_camera.gd` | 落後者優先的鏡頭演算法 |
 | `scripts/background_3d.gd` | 視差驅動 |
@@ -107,7 +107,10 @@ godot --headless --path . --import
 godot --path .          # 或直接用編輯器開,按 F5
 ```
 
-P1 = WASD(W 跳),P2 = 方向鍵(↑ 跳),R = 重置。
+P1 = WASD(W 跳),P2 = IJKL(I 跳;數字鍵盤 4/6/8 也綁了),R = 重置。
+
+**P2 不是方向鍵。** 這台鍵盤實測 `W + ↑ + →` 三顆同時按時 `→` 會被鍵盤矩陣
+封鎖掉,而這關是往右走的。IJKL 與數字鍵盤四鍵全過,完整實測表在 dev-log。
 
 ---
 

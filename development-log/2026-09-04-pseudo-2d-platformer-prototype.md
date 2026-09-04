@@ -329,6 +329,300 @@ owner 要換到 Windows 機器繼續。這輪加的檔案：
 
 `git commit` / `git push` 依 AGENTS.md 由 owner 手動執行，這裡不碰。
 
+## 步驟 9:Windows 環境重建(接續步驟 8)
+
+換到 Windows 11 機器上繼續。程式碼零改動,只補機器本地的東西。
+
+### 沿用的與新踩到的
+
+`project.godot` 的 sha256 是 `e2324091...`,**與 Linux 那台完全相同** ——
+`.gitattributes` 的 `* text=auto eol=lf` 生效了,`.gd` / `.tscn` / `.json`
+沒有被轉成 CRLF。
+
+**新問題:專案路徑有空格**(`C:\Users\Kila\hackerthon\New folder\hackathon`)。
+所有 CLI 呼叫、匯出輸出路徑都要引號包好。實務上的規避方式是用
+`-WorkingDirectory` + `--path .`,而不是把絕對路徑塞進參數。
+
+**`godot.exe` 是 GUI 版,不寫 stdout。** winget 裝的 `godot.exe` 是
+`Godot_v4.7.2-stable_win64.exe`,同目錄還有一支
+`Godot_v4.7.2-stable_win64_console.exe`。要抓 `half_w` 那行印出來的值,
+必須用 console 版跑,GUI 版重導向 stdout 會拿到空檔。
+
+### `--import` 這次沒有 abort
+
+```
+godot --headless --path . --import
+```
+
+Windows 官方版跑完 **exit 0,乾淨結束**,沒有 Linux Flatpak 那個
+`Parameter "singleton" is null` 的收尾 abort。`Player` / `SharedCamera`
+兩個 global class 都正常註冊。
+
+`project.godot` 的 sha256 前後相同、`git diff project.godot` 是空的、
+`git status` 乾淨 —— 這是 AGENTS.md 那條檢查**第二次真正有效力**地通過。
+
+### 匯出範本(R4 核對通過)
+
+`tools/install_export_templates.sh` 是 bash + `unzip`,Windows 這輪沒有
+腳本化,用一次性指令做完(要不要補一支 `.ps1` 留給 owner 決定):
+
+```bash
+curl -L -o "$SCRATCH/godot-4.7.2-templates.tpz" \
+  https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+unzip -l "$SCRATCH/...tpz" | grep -E "version\.txt|web_nothreads"   # 先驗成員名
+unzip -o -q -j "$SCRATCH/...tpz" -d "/c/Users/Kila/AppData/Roaming/Godot/export_templates/4.7.2.stable"
+```
+
+R4 三條全過:`version.txt` = `4.7.2.stable`(與引擎 `4.7.2.stable.official`
+相符)、`web_nothreads_release.zip` 與 `web_nothreads_debug.zip` 都在。
+攤平後 35 個檔案落地,與 Linux 那台一致。
+
+### 硬體與 AGENTS.md〈目標平台〉不符
+
+AGENTS.md 寫「主要開發與測試環境預設是 HP EliteBook 840 Aero G8
+(Intel Iris Xe 內顯,Fedora Sway Atomic)」。**這台是 NVIDIA GeForce
+RTX 4050 Laptop GPU**:
+
+```
+OpenGL API 3.3.0 NVIDIA 610.88 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4050 Laptop GPU
+```
+
+renderer 仍然是 Compatibility(硬需求,沒變),但**效能參考基準變了** ——
+在這台跑得順不代表 Iris Xe 跑得順。這是現況記錄,AGENTS.md 要不要改由
+owner 決定。
+
+## 步驟 10:停點 2 在 Windows 上重跑
+
+用 console 版開視窗、重導向 stdout、9 秒後全螢幕截圖。
+
+### 確認到的
+
+- **`half_w = 960.0`** —— 與 Linux 那台一致,N1 的三項處置在這台同樣生效。
+- 落差表與缺口斷言全過(320 / 300 / 340,上限 350),數字與 Linux 相同。
+- **視窗照 1280x720 開**。Sway 平鋪的問題在 Windows 不存在,畫面比例是預期的。
+- **3D 背景層有透出來**:截圖裡看得到三層深藍灰方塊,2D 平台與兩個玩家
+  (P1 紅、P2 藍)疊在上面。**桌面 OpenGL 下 `transparent_bg` 在 NVIDIA
+  上也成立**(Linux 那台是不同 GPU,這是第二個桌面資料點)。
+- stderr 全空,沒有任何錯誤或警告。
+
+### 又一次沒拿到乾淨的行為證據 —— 但成因與 Linux 那次相反
+
+截圖時(啟動 +9 秒)**兩個玩家都不在出生點**:出生點是 (200, 900) / (340, 900),
+截圖裡 P1 在 world x≈1490、站在 Ledge2(y=560),P2 在 world x≈916 半空中。
+兩人都往右移動且都離開了地面 —— 上升需要跳躍,而且兩人位置不同,代表
+**WASD 與方向鍵兩組輸入都被用到了**。
+
+沒有輸入不可能發生;程式也沒有任何自動驅動(這輪沒寫自動操作腳本)。
+所以那 9 秒裡有人在玩。**但我無法歸因**,所以不把它當成行為證據。
+
+Linux 那次的成因是「腳本自動操作 + 視窗搶焦點 → 真人按鍵污染腳本的 log」;
+這次沒有腳本,只有真人。**同樣的結論:視窗執行只用來看畫面,不用來蒐證。**
+
+之後行程結束(`stderr` 全空、無 crash trace),應該是被手動關掉的。
+
+## 步驟 11:`export_presets.cfg` 與 `tools/serve.py`
+
+### `export_presets.cfg`
+
+手寫,Web preset 一個。關鍵幾行:
+
+```ini
+export_filter="all_resources"
+include_filter="*.json"          # ◀ N3
+custom_features=""               # 不加任何 custom feature tag
+export_path="build/web/index.html"
+script_export_mode=2
+
+variant/thread_support=false     # no-threads
+html/custom_html_shell=""        # ◀ N5,不指任何 shell
+html/export_icon=false           # 這專案沒有 icon 檔
+html/focus_canvas_on_start=true
+html/canvas_resize_policy=2
+```
+
+`export_filter` / `script_export_mode` / `canvas_resize_policy` 這幾個**必須顯式
+寫**:手寫的 cfg 缺鍵時 Godot 讀到 nil,`export_filter` 空字串會變成什麼都不
+打包,`canvas_resize_policy` 缺了會退成 0。不是「照抄預設值」,是「缺了會壞」。
+
+`vram_texture_compression/*` 兩個都關 —— 這專案沒有任何匯入的貼圖(純
+ColorRect + BoxMesh),開著只會多一輪沒有對象的壓縮流程。
+
+### `tools/serve.py`
+
+標準庫 `http.server`,沒有任何第三方相依。四件事:
+
+- port 8099,綁 `127.0.0.1`
+- `.wasm` → `application/wasm`、`.pck` → `application/octet-stream`
+- 一律送 `Cache-Control: no-store, max-age=0`
+- **不送 COOP/COEP**
+
+用 `functools.partial(Handler, directory=...)` 指根目錄,**不用 `os.chdir`**
+—— 專案路徑有空格,而且 chdir 會污染同一個行程後續的相對路徑。
+
+**Windows 的坑:`python` 指到 Microsoft Store 的 stub**
+(`%LOCALAPPDATA%\Microsoft\WindowsApps\python.exe`),跑下去會開市集然後
+exit 49。要用 `py tools/serve.py`,或直接指
+`%LOCALAPPDATA%\Programs\Python\Python313\python.exe`。
+
+## 步驟 12:匯出與停點 3
+
+```
+godot --headless --path . --export-release "Web" "build/web/index.html"
+```
+
+exit 0。打包過程裡最重要的一行:
+
+```
+[   1% ] savepack | Storing File: res://data/level_01.json
+```
+
+**N3 生效了** —— 關卡 JSON 真的進了 pck。產出 `index.wasm` 39.5 MB、
+`index.pck` 34 KB、`index.js` 280 KB。
+
+### Chrome 的實際結果
+
+`serve.py` 起來後 `curl` 先驗過標頭:`.wasm` 回 `application/wasm`、
+`.pck` 回 `application/octet-stream`、`Cache-Control: no-store`、沒有
+COOP/COEP。然後用乾淨的暫時 profile 開 Chrome。
+
+**console 開頭三行(這是這一整輪最重要的證據)**:
+
+```
+Godot Engine v4.7.2.stable.official.ed1daf0bf
+OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+```
+
+- **WebGL 2.0**,Compatibility —— renderer 鎖 `gl_compatibility`(N2)是對的
+- **single-threaded** —— no-threads 範本確實被用上
+
+接著 console 印出完整落差表與缺口斷言(全過),以及:
+
+```
+[Main] divisor=4 render=(480, 270) zoom=(0.25, 0.25) 可視世界=(1920.0, 1080.0)
+[SharedCamera] setup  viewport=(480.0, 270.0) zoom=(0.25, 0.25)  half_w=960.0 half_h=540.0
+[Level] activate:bounds=[P: (0.0, -600.0), S: (6720.0, 1800.0)] initial_cam=(200.0, 900.0)
+```
+
+**`half_w = 960.0` 在瀏覽器裡也一樣。** Godot 側零 error / 零 warning。
+`chrome_debug.log` 裡其餘的 ERROR 行全是 Chrome 自己的(Adobe PDF 擴充、
+USB 列舉、GCM 註冊),與這個專案無關。
+
+### 截圖裡看到的(R1,不由我下結論)
+
+畫面**不是黑底**:三層深藍灰的 3D 方塊透出來,2D 平台與兩個玩家(P1 紅、
+P2 藍)疊在上面,兩人都在出生點的地面上。與桌面截圖的構圖一致。
+
+R1 的失敗模式正好是「有畫面、能玩、只是背景是黑的」,而這裡背景有內容,
+所以**看起來**對稱雙 SubViewport 架構在 WebGL2 下成立。判讀權在 owner。
+
+### R2 尚未驗證
+
+方向鍵會不會捲動頁面,要真的按下去才知道 —— 畫面沒有捲軸不代表沒中招。
+**這輪不預先處理**(N5),等 owner 玩過再說。
+
+## 步驟 13:停點 3 的判讀結果(owner)
+
+- **R1 沒問題** —— WebGL2 下 3D 背景有透出來,對稱雙 SubViewport 架構成立。
+- **R2 正常** —— 方向鍵在瀏覽器裡的行為與桌面一致,沒有捲頁問題。
+  **不需要自訂 HTML shell**,N5 的「完全不做」維持不變。
+
+兩個風險都拆掉之後,這輪的架構驗證告一段落。
+
+## 步驟 14:鍵盤 rollover 實測與 P2 改鍵
+
+owner 回報「兩角色不能同時跳躍和前進」。plan-v5 的 R3 預期過這件事,但
+**不能靠預期定案** —— 要先分清楚是硬體丟鍵還是程式 bug。
+
+### 診斷方法
+
+做了一個只有 `keydown` / `keyup` 的網頁(放 scratchpad,repo 不動):顯示
+當下按住的鍵、逐題要求按住指定組合、全部到齊自動判 PASS、按不出來由人點
+FAIL。**刻意不經過 Godot** —— 如果連純瀏覽器都收不到那顆鍵,就證明它在
+鍵盤內部就被丟掉了,與遊戲程式無關。
+
+每個 P2 候選測四種方向組合(`A`/`D` × P2 左/右)。只測一邊會漏掉一半,
+因為 `A` 和 `D` 在矩陣上是不同位置。
+
+### 結果
+
+```
+## 基準
+  PASS   P1 一個人跑 + 跳            [D + W]
+  PASS   兩人只移動,都不跳          [D + →]
+  PASS   兩人只跳,都不移動          [W + ↑]
+## 方向鍵(原本的設定)
+  PASS   P1 左+跳,P2 左+跳          [A + W + ← + ↑]
+  FAIL   P1 左+跳,P2 右+跳          [A + W + → + ↑]
+  PASS   P1 右+跳,P2 左+跳          [D + W + ← + ↑]
+  FAIL   P1 右+跳,P2 右+跳          [D + W + → + ↑]
+## IJKL
+  PASS × 4
+## 數字鍵盤 4 / 6 / 8
+  PASS × 4
+```
+
+(右 Shift / 數字鍵盤 0 那三組 owner 說是故意失敗的,資料不採計。)
+
+### 讀出來的兩件事
+
+**1. 不是數量上限,是幾何衝突。** `←` 全過、`→` 全掛;而 IJKL 與數字鍵盤
+**同樣是四鍵、同樣全過**。所以這張鍵盤四鍵沒問題,純粹是 `W` / `↑` / `→`
+三顆在矩陣裡構成長方形,韌體為了不回報鬼鍵把 `→` 丟掉。
+
+**2. 程式沒有問題。** 診斷頁沒有跑任何一行 `player.gd`,連 Godot 都沒進去,
+同一組四鍵換成 IJKL 就過 —— 程式碼不會挑物理鍵位。`scripts/player.gd`
+未改動。
+
+失敗模式對上症狀:**這關是往右走的**,P2 的主要移動方向就是 `→`,所以
+「P2 往右跑同時跳」在 P1 也跳的時候會消失。
+
+### 改法
+
+`project.godot` 的 `p2_*` 改綁 **IJKL**(`I` 在 `J`/`L` 上方,是 WASD 的
+右手鏡像,手型完全一樣),外加**數字鍵盤 4/6/8** 當第二組 —— Godot 的
+InputMap 一個 action 可以綁多個事件,兩組並存零代價。
+
+**方向鍵拿掉**,不留著。留著等於留一條會靜默壞掉的路,下次有人用方向鍵玩
+會撞上同一件事,而症狀一樣不明顯。
+
+鍵碼用 headless 印出來確認過,不用猜:`I`=73 / `J`=74 / `L`=76、
+`KP_4`=4194442 / `KP_6`=4194444 / `KP_8`=4194446。改完再 headless 讀回
+`InputMap.action_get_events()` 驗證解析正確。
+
+**還沒驗的:NumLock 關閉時數字鍵盤那組是否仍有效。** Windows 在 NumLock
+關閉時對數字鍵送的是方向鍵的掃描碼,診斷頁用的是 `event.code`(永遠回
+`Numpad4`),Godot 用的是 physical keycode,兩者不保證一致。主力是 IJKL,
+它沒有這個依賴,所以不阻擋;數字鍵盤那組當加分項,待實測。
+
+### 一件要記在設計階段的事
+
+現在每人最多同時兩顆鍵(方向 + 跳),兩人合計 4 顆,剛好是這張鍵盤撐得住
+的量。**玩法若要加第三個動作**(抓取、衝刺、互動),就變成每人 3 顆、合計
+6 顆,**必須重測**,現在這張表不能外推。
+
+## 步驟 15:出界重生改成「兩人一起回出生點」
+
+owner 拍板推翻 N4 的「回最近的安全落腳點」。
+
+**這不是把 N4 的理由否決掉,是它的前提消失了。** N4 當初的問題是:只把
+一個人送回起點 → `trail_x = min(p1.x, p2.x)` 暴跌 → 鏡頭滑回開頭 → 還在
+遠處的另一個玩家被推出畫面。**兩人一起回**的話沒有人留在遠處,衝突不存在,
+鏡頭 `snap_to_target()` 一次就位,「永不把落後者推出畫面」仍然成立。
+
+實作是把 `_guard_out_of_bounds()` 從「個別 `teleport_to(last_grounded_
+position)`」改成「任何一人出界就呼叫 `_reset_all()` 並 return」,`_reset_all()`
+加一個 `reason` 參數區分是 R 鍵還是出界,log 才分得出來。
+
+**連帶效果(是決定,不是副作用)**:
+
+1. 一個人失誤兩個人一起被拉回去 —— owner 要的合作壓力。
+2. 出界與 R 鍵變成同一個行為。
+3. **`last_grounded_position` 不再兼任重生點**,只服務鏡頭的垂直參考點。
+   欄位保留(鏡頭仍需要),但 `player.gd` 的註解與 AGENTS.md 裡拿它當
+   「一個欄位服務兩件事」範例的那段都跟著改了 —— 規則本身不變,只是例子
+   的事實基礎變了。
+
 # 已知問題
 
 （待補）
