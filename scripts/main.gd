@@ -32,8 +32,8 @@ const LOGICAL_SIZE := Vector2i(1920, 1080)
 @onready var _game_viewport: SubViewport = $GameViewport
 @onready var _background_view: TextureRect = $Compositor/BackgroundView
 @onready var _gameplay_view: TextureRect = $Compositor/GameplayView
-@onready var _background_3d: Node3D = $BgViewport/Background3D
-@onready var _level: Node2D = $GameViewport/Level
+@onready var _background_3d: Background3D = $BgViewport/Background3D
+@onready var _level: Level = $GameViewport/Level
 @onready var _camera: SharedCamera = $GameViewport/Level/SharedCamera
 
 
@@ -41,7 +41,8 @@ const LOGICAL_SIZE := Vector2i(1920, 1080)
 ##   1. 尺寸  —— 決定 half_w 的分子
 ##   2. zoom  —— 決定 half_w 的分母
 ##   3. 貼圖  —— 必須在尺寸定案後才拿 ViewportTexture
-##   4. 訊號  —— 背景層要能收到第一次 camera_moved
+##   4. 訊號  —— 背景層要能收到第一次 camera_moved 與第一次 space_changed
+##              (Level.activate() 才發第一次 space_changed,就是為了等這一步)
 ##   5. 放行  —— 到這裡鏡頭算什麼都是對的
 func _ready() -> void:
 	var d := maxi(render_divisor, 1)
@@ -58,6 +59,9 @@ func _ready() -> void:
 	_gameplay_view.texture = _game_viewport.get_texture()
 
 	_camera.camera_moved.connect(_background_3d.on_camera_moved)
+	# 空間切換也只是一條單向訊號。背景層一樣不知道玩家、不知道關卡狀態,
+	# 只知道「現在是哪個空間」這個字串。
+	_level.space_changed.connect(_background_3d.on_space_changed)
 
 	print("[Main] divisor=%d render=%s zoom=%s 可視世界=%s" % [
 		d, render_size, _camera.zoom, Vector2(render_size) / _camera.zoom])

@@ -39,32 +39,37 @@
 
 | 檔案 | 內容 |
 |---|---|
-| `project.godot` | renderer 鎖 `gl_compatibility`(兩條)、stretch `canvas_items`/`keep`、1920x1080 邏輯尺寸、1280x720 開發視窗、7 個 input action |
+| `project.godot` | renderer 鎖 `gl_compatibility`(兩條)、stretch `canvas_items`/`keep`、1920x1080 邏輯尺寸、1280x720 開發視窗、**9 個 input action**(多了 `p1/p2_toggle_space`) |
 | `scenes/main.tscn` | 合成樹:Compositor(兩個 TextureRect)+ BgViewport + GameViewport |
 | `scenes/player.tscn` | CharacterBody2D 60x88,layer 2 / mask 1 |
 | `scenes/background_3d.tscn` | 三層方塊共 24 個 MeshInstance3D + BoxMesh |
 | `scripts/main.gd` | **唯一的初始化排序點**。尺寸→zoom→貼圖→訊號→放行 |
-| `scripts/level.gd` | 讀 JSON、生平台、缺口斷言、落差表、R 鍵、出界防護(兩人一起回出生點) |
+| `scripts/level.gd` | 讀 JSON、生兩個空間的平台與拾取物、跨空間可達性斷言、落差表、**空間切換與卡牆預檢**、R 鍵、出界防護(兩人一起回出生點) |
 | `scripts/player.gd` | 控制器,`input_prefix` 區分兩人,coyote time |
 | `scripts/shared_camera.gd` | 落後者優先的鏡頭演算法 |
-| `scripts/background_3d.gd` | 視差驅動 |
-| `data/level_01.json` | 12 個平台,4 段地面 + 8 個浮空平台,x 跨 0→6720 |
+| `scripts/background_3d.gd` | 視差驅動 + **隨空間切換換色組**(正常空間那組從場景讀,不寫在程式碼裡) |
+| `data/level_01.json` | **第一關**:17 個平台(封閉房間 + 5 柱 5 台交錯 + 4 塊碎片)、2 個拾取物,x 跨 0→7720。每塊平台有 `space` 欄位 |
+| `art/`、`tools/make_spritesheet.py` | 貓貼圖管線。**這輪沒動過**,見 `2026-09-04-sprite-pipeline-and-player-art.md` |
 | `tools/install_export_templates.sh` | 冪等的範本安裝(**bash,Windows 要另外處理**) |
 
 ### 驗證過的
 
-- 缺口斷言全過:320 / 300 / 340,上限 350
 - **`half_w = 960.0`**(不是 1024)—— 架構約束 2 生效的關鍵證據
-- 3D 背景層有透出來,2D 層疊在上面 —— 桌面 OpenGL 下 `transparent_bg` 成立
-- 鏡頭 clamp 正確:`trail_x < 960` 時卡在 960,超過才開始跟
+- **R1 通過**:WebGL2 下 3D 背景有透出來,對稱雙 SubViewport 架構成立(owner 判讀)
+- **R2 正常**:方向鍵不捲頁,不需要自訂 HTML shell(N5 的「完全不做」維持)
+- 跨空間可達性斷言全過:14 段無落腳面區間,最寬 210,上限 350
+- 雙空間機制的行為證據(模擬輸入,20 項全過):mask 1↔4 交換、
+  卡牆預檢擋下切換且玩家一單位都沒動、非持有者按切換沒反應、
+  拾取與 R 鍵重置會把關卡狀態一起清乾淨
+- `InputMap` 的 `location` 欄位真的分得開左右 Shift(`event_is_action` 實測)
 
 ### 還沒做
 
-1. **乾淨的行為驗證** —— 上一輪的 log 被真實鍵盤污染(見下方「已知問題」)
-2. **owner 親手試玩** —— 停點 2 的重點,手感只能由人判
-3. `export_presets.cfg`
-4. `tools/serve.py`(本機靜態伺服器,給瀏覽器看用)
-5. **匯出到 Chrome** —— 停點 3,**R1 唯一真正的驗證**
+1. **5 鍵 rollover 實測** —— 切換鍵目前是暫定的左/右 Shift。停點 A
+2. **owner 親手試玩** —— 切換手感、幽靈預覽讀不讀得懂。停點 B
+3. **帶著切換鍵重新匯出到 Chrome** —— 新綁的鍵是這輪唯一新增的瀏覽器風險面。停點 C
+4. 地板崩塌、出口、過關條件(下一輪)
+5. 第二關 —— `image.png` 還沒進來,只有文字敘述
 
 ---
 
@@ -142,24 +147,37 @@ owner 的規則:連續執行,但這三處**停下來回報並等回覆**,不要�
 > 已完成。owner 據此把 `Ledge3` / `Ledge8` 的 y 從 700 抬到 760
 > (原本爬升 300,跳躍高度 300.48,餘裕只有 0.48,實務上跳不上去)。
 
-### 停點 2 — 桌面第一次跑起來 ⏸ **現在停在這裡**
+### 停點 2 — 桌面第一次跑起來 ✅ 已通過
 
-要回報:
-- `activate()` 印出的 `half_w` 實際值(應為 960;**1024 表示 N1 有一步沒生效**)
-- 截圖
-- 觀察到的行為:兩人能不能各自動、鏡頭有沒有照落後者優先、3D 背景有沒有視差
+`half_w = 960` ✅、截圖 ✅。當時「行為證據不乾淨」那一項後來由模擬輸入解掉了
+(見〈已知問題〉第 1 條)。
 
-**截圖交給 owner 判讀,不下「通過」的結論。**
+### 停點 3 — 匯出到 Chrome ✅ 已通過
 
-> 進度:`half_w = 960` ✅、截圖 ✅、**行為證據不乾淨** ❌(見下)
+owner 判讀:**R1 沒問題**(3D 背景有透出來)、**R2 正常**(方向鍵不捲頁)。
+itch.io 上也實際跑過。
 
-### 停點 3 — 匯出到 Chrome 之後
+---
 
-匯出成功、`serve.py` 起來、頁面能開之後停,附截圖。
+## 第一關這一輪的三個停點
 
-**R1 的失敗長得像成功**:`transparent_bg` 在 WebGL2 下失敗時畫面**不是
-全黑**,而是 3D 層被 2D 層的黑底蓋掉 —— 看起來像「有畫面、能玩、只是背景
-是黑的」。極容易誤判成通過,**這張圖一定由 owner 看**。
+### 停點 A — 5 鍵 rollover 實測 ⏸ **現在停在這裡**
+
+切換空間的最壞情況是同時 5 鍵(兩人各按方向 + 跳,再加切換鍵)。上一輪測出來
+這台鍵盤的天花板是 4 鍵,而且失敗是**幾何**的不是數量的,所以舊表不能外推。
+
+測試頁在 scratchpad(`krotest5.html`,純瀏覽器、不經過 Godot)。
+**沒有這張表就不定案切換鍵。** `project.godot` 現在綁的左/右 Shift 是暫定值。
+
+### 停點 B — 桌面試玩
+
+要 owner 判的:切換手感、幽靈預覽讀不讀得懂、卡牆被擋下來合不合理、
+護目鏡前後的差別、R 鍵與出界重置有沒有把關卡狀態一起清乾淨。
+
+### 停點 C — 帶著切換鍵重新匯出到 Chrome
+
+**桌面成功不等於瀏覽器成功。** 要看的是切換鍵會不會被瀏覽器攔
+(空白鍵捲頁、Ctrl 組合被吃掉),以及 3D 背景的色組切換有沒有正常出現。
 
 ### 額外規則 — 偏離計畫就停
 
@@ -173,14 +191,16 @@ owner 的規則:連續執行,但這三處**停下來回報並等回覆**,不要�
 
 ## 已知問題
 
-### 1. 視窗會搶焦點,行為 log 會被真實鍵盤污染
+### 1. 視窗會搶焦點,行為 log 會被真實鍵盤污染 —— 已有做法
 
 用 `Input.action_press()` 自動操作 + 視窗執行去驗證行為時,遊戲視窗搶走
-焦點,owner 同時在機器上打的字全部進了遊戲 —— P2 在腳本按下它的鍵之前
-就開始移動,還有整段以全速往左跑。
+焦點,owner 同時在機器上打的字全部進了遊戲。
 
-**做法**:行為驗證一律走 headless(沒有視窗就不會搶焦點),視窗執行只用來
-看畫面。**兩者分開,不要想用同一次執行同時拿到兩種證據。**
+**做法**:行為驗證一律走
+`godot --headless --path . --script res://<SceneTree 腳本>.gd` + `Input.action_press()`
+(沒有視窗就不會搶焦點);截圖則**不能加 `--headless`**,dummy renderer 產不出圖。
+**兩者分開,不要想用同一次執行同時拿到兩種證據。**
+驗證用的腳本用完就刪,不留在 repo(AGENTS.md)。
 
 ### 2. tiling WM 底下視窗不照 1280x720 開
 
@@ -192,11 +212,17 @@ Sway 直接把它平鋪成接近全螢幕。不是專案設定錯誤。Windows �
 `Parameter "singleton" is null` at `editor_node.cpp:6618`,然後 core
 dumped。快取已經正確寫出,不影響結果。
 
-### 4. R1 還沒真正驗過
+### 4. 切換鍵是暫定的
 
-桌面 OpenGL 下 `transparent_bg` 是work的,但**WebGL2 才是有風險的那一半**。
-若壞掉,退路是「只有 3D 進 SubViewport」的分層 —— 代價是失去 2D 層的獨立
-濾鏡插槽。**先回報再改,不要自己決定。**
+`project.godot` 綁的左/右 Shift 還沒經過 5 鍵 rollover 實測。**Ctrl 已排除**:
+P1 的跳躍是 `W`,`Ctrl+W` 在瀏覽器是關閉分頁,而且 `preventDefault()` 攔不住。
+空白鍵排最後,因為它捲頁 —— 中招就得動自訂 HTML shell,那是 plan-v5 #19
+明寫「完全不做」的東西。
+
+### 5. NumLock 關閉時數字鍵盤那組是否有效
+
+從 P2 改鍵那一輪掛到現在,還是沒驗過。主力是 IJKL,不依賴 NumLock,
+所以不擋任何事。
 
 ---
 

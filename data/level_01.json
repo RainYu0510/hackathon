@@ -1,27 +1,41 @@
 {
-  "_comment": "座標系統:x = 平台左緣,y = 平台上緣(踩踏面)。單位是邏輯單位(1920x1080 尺度),不隨 render_divisor 改變。spawns 的 x/y 是玩家碰撞箱中心。",
+  "_comment": "座標系統:平台的 x = 左緣,y = 上緣(踩踏面);pickups 與 spawns 的 x/y 是「中心」。單位是邏輯單位(1920x1080 尺度),不隨 render_divisor 改變。",
 
-  "bounds": { "min_x": 0, "max_x": 6720, "min_y": -600, "max_y": 1200 },
+  "_comment_space": "space = normal | alt | both。both 是兩個空間都存在的實體。缺欄位時當 both,但落差表會把 space 印出來,所以漏寫看得見。切換空間改的是玩家的 collision_mask,平台的 layer 設定一次之後不變。",
+
+  "_comment_design": "第一關的三段:(1) 封閉房間 —— 右牆只存在於正常空間,撿到護目鏡切到異空間,牆消失就走得出去,機制第一次使用就是用來解自己的謎。(2) 中段跑酷 —— 柱子(normal)與細台(alt)交錯,同空間的相鄰間隔一律 620,遠大於跳躍能跨的 350,所以任何一個空間單獨都走不通,必須每跳一次切一次。(3) 破碎的異空間房間 —— 四塊只存在於 alt 的碎片,盡頭是鑰匙。",
+
+  "bounds": { "min_x": 0, "max_x": 7720, "min_y": -400, "max_y": 1200 },
 
   "spawns": [
     { "x": 200, "y": 900 },
     { "x": 340, "y": 900 }
   ],
 
-  "ground_y": 1000,
-
   "platforms": [
-    { "name": "Ground1", "x":    0, "y": 1000, "w": 1600, "h":  80 },
-    { "name": "Ledge1",  "x":  900, "y":  760, "w":  380, "h":  40 },
-    { "name": "Ledge2",  "x": 1450, "y":  560, "w":  320, "h":  40 },
-    { "name": "Ground2", "x": 1920, "y": 1000, "w": 1200, "h":  80 },
-    { "name": "Ledge3",  "x": 2100, "y":  760, "w":  400, "h":  40 },
-    { "name": "Ledge4",  "x": 2750, "y":  520, "w":  340, "h":  40 },
-    { "name": "Ground3", "x": 3420, "y": 1000, "w": 1400, "h":  80 },
-    { "name": "Ledge5",  "x": 3500, "y":  760, "w":  420, "h":  40 },
-    { "name": "Ledge6",  "x": 4150, "y":  560, "w":  360, "h":  40 },
-    { "name": "Ledge7",  "x": 4700, "y":  420, "w":  300, "h":  40 },
-    { "name": "Ground4", "x": 5160, "y": 1000, "w": 1560, "h":  80 },
-    { "name": "Ledge8",  "x": 5400, "y":  760, "w":  440, "h":  40 }
+    { "name": "RoomFloor", "space": "both",   "x":    0, "y": 1000, "w": 1100, "h":  200 },
+    { "name": "RoomWallL", "space": "both",   "x":    0, "y":  550, "w":   60, "h":  450 },
+    { "name": "RoomWallR", "space": "normal", "x": 1040, "y":  550, "w":   60, "h":  450 },
+
+    { "name": "LedgeA",    "space": "alt",    "x": 1310, "y":  880, "w":  200, "h":   40 },
+    { "name": "PillarA",   "space": "normal", "x": 1720, "y":  840, "w":  240, "h":  360 },
+    { "name": "LedgeB",    "space": "alt",    "x": 2170, "y":  740, "w":  200, "h":   40 },
+    { "name": "PillarB",   "space": "normal", "x": 2580, "y":  680, "w":  240, "h":  520 },
+    { "name": "LedgeC",    "space": "alt",    "x": 3030, "y":  580, "w":  200, "h":   40 },
+    { "name": "PillarC",   "space": "normal", "x": 3440, "y":  520, "w":  240, "h":  680 },
+    { "name": "LedgeD",    "space": "alt",    "x": 3890, "y":  420, "w":  200, "h":   40 },
+    { "name": "PillarD",   "space": "normal", "x": 4300, "y":  360, "w":  240, "h":  840 },
+    { "name": "LedgeE",    "space": "alt",    "x": 4750, "y":  260, "w":  200, "h":   40 },
+    { "name": "PillarE",   "space": "normal", "x": 5160, "y":  200, "w":  700, "h": 1000 },
+
+    { "name": "ShardA",    "space": "alt",    "x": 6060, "y":  240, "w":  180, "h":   40 },
+    { "name": "ShardB",    "space": "alt",    "x": 6440, "y":  180, "w":  180, "h":   40 },
+    { "name": "ShardC",    "space": "alt",    "x": 6820, "y":  260, "w":  180, "h":   40 },
+    { "name": "ShardD",    "space": "alt",    "x": 7200, "y":  200, "w":  320, "h":   40 }
+  ],
+
+  "pickups": [
+    { "name": "Goggles", "kind": "goggles", "x":  960, "y": 800, "w": 64, "h": 40 },
+    { "name": "Key",     "kind": "key",     "x": 7360, "y":  80, "w": 44, "h": 44 }
   ]
 }
