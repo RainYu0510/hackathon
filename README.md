@@ -6,8 +6,8 @@ Open `project.godot` in Godot 4 and run the project.
 - Player 2: Arrow keys, Up jump, K attack, L interact/dimension.
 - Player 2 also has direct arrow-key fallback handling for imported-project compatibility.
 - F1 toggles debug HUD, F2/F3 force dimensions, R resets the room.
-- `Level01.tscn` is the playable tutorial. `Level04.tscn` is the charge puzzle.
-- Levels 02, 03 and 05 intentionally contain only `LEVEL DESIGN TBD`.
+- Level flow: `Level01.tscn` (tutorial) -> `Level02.tscn` (placeholder route, design pending) -> `Level03.tscn` (charge puzzle, currently the last level).
+- `Level04_PLACEHOLDER.tscn` and `Level05_PLACEHOLDER.tscn` are unused slots that still contain only `LEVEL DESIGN TBD`.
 
 ## v3 fixes
 

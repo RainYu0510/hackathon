@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 [ext_resource path="res://actors/enemies/ChargeMonster/ChargeMonster.gd" type="Script" id="1"]
+[ext_resource path="res://components/HitBox.gd" type="Script" id="2"]
 [sub_resource type="RectangleShape2D" id="Body"]
 size = Vector2(76,64)
+[sub_resource type="RectangleShape2D" id="Charge"]
+size = Vector2(80,64)
 [node name="ChargeMonster" type="CharacterBody2D"]
 script = ExtResource("1")
 collision_layer = 4
@@ -10,7 +13,18 @@ collision_mask = 1
 position = Vector2(0,-32)
 polygon = PackedVector2Array(-38,-32,38,-32,38,32,-38,32)
 color = Color(0.54,0.45,0.84,1)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0,-38)
+scale = Vector2(0.55,0.55)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0,-32)
 shape = SubResource("Body")
-
+[node name="HitBox" type="Area2D" parent="."]
+position = Vector2(0,-32)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("2")
+team = "enemy"
+damage = 99
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("Charge")
