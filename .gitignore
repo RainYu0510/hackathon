@@ -15,3 +15,9 @@ Thumbs.db
 
 # Python
 __pycache__/
+
+# Secrets and signing material (preventive - none currently exist)
+.env
+.env.*
+*.jks
+*.keystore

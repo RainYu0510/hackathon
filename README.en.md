@@ -32,6 +32,12 @@ This project attacks that directly: **make the two players' abilities deliberate
 
 ```mermaid
 flowchart TB
+    subgraph UI["ui/ · menu layer (entry point)"]
+        MM["MainMenu<br/>start / level select / controls / quit<br/>main_scene points here"]
+        PM["PauseMenu<br/>opened with Esc · resume / menu / quit"]
+        TH["menu_theme.tres<br/>shared by both menus"]
+    end
+
     subgraph AL["autoload/ · global singletons"]
         DM["DimensionManager<br/>space state + dimension_changed signal"]
         GM["GameManager<br/>key / completion / level restart"]
@@ -59,6 +65,13 @@ flowchart TB
 
     BW["interactables/<br/>BreakableWall · Key<br/>GogglePickup · DeathZone"]
 
+    MM -- "start / level select" --> L1
+    MM -. level select .-> L2
+    MM -. level select .-> L3
+    MM --- TH
+    PM --- TH
+    LB -- "one per level" --> PM
+    PM -- "back to menu" --> MM
     DM -- dimension_changed --> DW
     DM -- dimension_changed --> BW
     DM -- dimension_changed --> CM
@@ -89,15 +102,19 @@ Directory responsibilities:
 
 | Directory | Contents |
 |---|---|
+| `ui/` | **Main menu, level select, Esc pause menu and the shared** `menu_theme.tres`. `run/main_scene` points at `ui/MainMenu.tscn` — this is the game's entry point |
 | `autoload/` | Two global singletons: space state and cross-level game state |
 | `levels/` | `LevelBase` framework plus each level. **Level geometry is built procedurally in GDScript**; the `.tscn` files are empty `Node2D`s carrying a script |
 | `actors/` | Players (`PlayerBase` plus two character scenes) and enemies |
 | `components/` | Composable components: `HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | Key, goggles, breakable wall, death zone and friends |
 | `systems/` | Space switching and the shared camera |
-| `data/` | Static level data |
+| `assets/` | Art (152 PNGs) and audio (8 wav + 3 mp3) |
+| `data/` | Static level data (currently only `level_02.json`) |
 | `tools/` | Sound synthesis script, local static server, export template installer |
-| `development-log/` | Per-session design decision records |
+| `docs/` | [Release guide](docs/release-guide.md) (GitHub Release and itch.io upload steps), plus `plan-v5.md` (**a plan for an earlier prototype — not the current architecture**) |
+| `development-log/` | Per-session design decision records, five entries. The latest covers [the menu, exit unification and slime rework](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
+| `AGENTS.md` | Project working agreements plus two hard architecture rules (always poll the `Input` singleton; cross-node initialisation always flows parent-to-child), both of which the code actually follows |
 
 ## Tech Stack
 
@@ -179,6 +196,8 @@ The export configuration is version-controlled (`export_presets.cfg`), so these 
 | `F3` | Force alternate space |
 
 > The interact key is overloaded: while holding the goggles it switches spaces, otherwise it picks up / interacts.
+>
+> The Quit button in both the main menu and the pause menu **hides itself in the browser build** (a browser tab cannot close itself); it only appears in the desktop build.
 
 ## Showcase
 
@@ -197,11 +216,15 @@ Everything below was verified against the source, not assumed:
 
 **Inconsistencies and unwired content**
 - **The game plays no audio at all.** None of the 11 files in `assets/audio/` is referenced by any `.gd` or `.tscn`; play is silent
-- **Player attacks have no target in the playable levels**: the charging monster has no `HurtBox` (it cannot be killed), and the slime — the only entity with an enemy `HurtBox` — is never spawned by any level
+- **Player attacks have no target in the playable levels**: the level 3 enemy (class `ChargeMonster`, drawn with the slime art) has no `HurtBox` and cannot be killed, and `Slime.tscn` — the only entity carrying an enemy `HurtBox` — is never spawned by any level. So `F` / `K` hit nothing across all three levels
+- **The level 3 enemy is a one-hit kill**: its `HitBox` has `damage = 99` against a player `HealthComponent` with `max_health = 5`, so being caught by a charge kills instantly and reloads the level
 - **Checkpoints are purely decorative**: the door-shaped objects do not act as respawn points. Death always reloads the level, and `GameManager.respawn_all()` has no callers
 - Player 2's `p2_left` / `p2_right` are bound to incorrect physical keycodes in `project.godot` (they map to Insert and Pause). The arrow keys work only through a hardcoded fallback input path for player 2 in `actors/players/PlayerBase.gd`
 - Once a character holds the goggles, the interact key is consumed by space switching and that character can no longer pick anything up
-- `interactables/CollapsingPlatform.gd`, `ui/HUD.tscn`, the portal art and the platform atlases all exist but are not wired in
+- **The tether gives no visual feedback**: at 820 px apart, outward movement input is silently zeroed with nothing on screen to explain it
+- **Roughly 32 PNGs are unused**: `LevelBase.platform()` only ever loads `platform_02/03` and their crimson counterparts, leaving `platform_01` and `platform_04`–`platform_12` (both palettes) unreferenced, along with the portal art (7 files), two platform atlases and the slime's jump animation (5 files)
+- `interactables/CollapsingPlatform.gd` and `ui/HUD.tscn` are dead paths: `Level01._collapse()` has no callers and `LevelBase.collapse_platforms` is always empty; the real HUD is built in code by `LevelBase._build_common()`, and nothing references `ui/HUD.tscn`
+- `levels/Level03.gd.uid` and `levels/Level04.gd.uid` hold the same UID, which produces one import warning on every `godot --headless --import`. It does not affect runtime
 
 **Not present**
 - No single-player mode, no audio or key-binding settings (the pause panel only offers resume / main menu / quit)

@@ -32,6 +32,12 @@
 
 ```mermaid
 flowchart TB
+    subgraph UI["ui/ · 選單層（遊戲入口）"]
+        MM["MainMenu<br/>開始 / 選關 / 操作說明 / 離開<br/>main_scene 指向這裡"]
+        PM["PauseMenu<br/>Esc 開啟 · 繼續 / 回主選單 / 離開"]
+        TH["menu_theme.tres<br/>兩個選單共用"]
+    end
+
     subgraph AL["autoload/ · 全域單例"]
         DM["DimensionManager<br/>空間狀態 + dimension_changed 訊號"]
         GM["GameManager<br/>鑰匙 / 過關 / 整關重來"]
@@ -59,6 +65,13 @@ flowchart TB
 
     BW["interactables/<br/>BreakableWall · Key<br/>GogglePickup · DeathZone"]
 
+    MM -- "開始遊戲 / 選關" --> L1
+    MM -. 選關可直接進入 .-> L2
+    MM -. 選關可直接進入 .-> L3
+    MM --- TH
+    PM --- TH
+    LB -- 每關掛一個 --> PM
+    PM -- "回主選單" --> MM
     DM -- dimension_changed --> DW
     DM -- dimension_changed --> BW
     DM -- dimension_changed --> CM
@@ -89,15 +102,19 @@ flowchart TB
 
 | 目錄 | 內容 |
 |---|---|
+| `ui/` | **主選單、選關面板、Esc 暫停選單與共用主題** `menu_theme.tres`。`run/main_scene` 指向 `ui/MainMenu.tscn`，遊戲的入口在這裡 |
 | `autoload/` | 兩個全域單例：空間狀態與跨關卡遊戲狀態 |
 | `levels/` | `LevelBase` 關卡框架與各關實作。**關卡幾何在 GDScript 中以程式建構**，`.tscn` 只是掛腳本的空 `Node2D` |
 | `actors/` | 玩家（`PlayerBase` + 兩個角色場景）與敵人 |
 | `components/` | 可組合元件：`HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | 鑰匙、護目鏡、可破壞牆、死亡區等互動物件 |
 | `systems/` | 空間世界切換與共用鏡頭 |
-| `data/` | 靜態關卡資料 |
+| `assets/` | 美術（152 張 PNG）與音訊（8 wav + 3 mp3）素材 |
+| `data/` | 靜態關卡資料（目前只有 `level_02.json`） |
 | `tools/` | 音效合成腳本、本機靜態伺服器、匯出範本安裝腳本 |
-| `development-log/` | 逐次開發決策紀錄 |
+| `docs/` | [發布指南](docs/release-guide.md)（GitHub Release 與 itch.io 上傳步驟），以及 `plan-v5.md`（**前一個原型的計畫文件，非現行架構**） |
+| `development-log/` | 逐次開發決策紀錄，共 5 篇。最新一篇是 [主選單／過關統一／史萊姆重做](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
+| `AGENTS.md` | 專案的協作規約與兩條架構通則（輸入一律輪詢 `Input` singleton；跨節點初始化一律父推子），程式碼實際遵循這兩條 |
 
 ## 使用技術
 
@@ -179,6 +196,8 @@ python tools/serve.py
 | `F3` | 強制切到異空間 |
 
 > 互動鍵是共用的：持有護目鏡時按下即切換空間，未持有時則是拾取／互動。
+>
+> 主選單與暫停選單的「離開遊戲」按鈕在**瀏覽器版會自動隱藏**（瀏覽器分頁無法自行關閉），只有桌面版看得到。
 
 ## 作品展示
 
@@ -197,11 +216,15 @@ python tools/serve.py
 
 **機制的不一致與未接上的部分**
 - **遊戲不播放任何音效**。`assets/audio/` 內 11 個音檔全數沒有被任何 `.gd` 或 `.tscn` 引用，遊戲中是無聲的
-- **玩家攻擊在可玩關卡中沒有目標**：衝刺怪沒有 `HurtBox`（無法被擊殺），唯一具備敵方 `HurtBox` 的史萊姆從未被任何關卡生成
+- **玩家攻擊在可玩關卡中沒有目標**：第三關的敵人（class 名為 `ChargeMonster`，借用史萊姆美術）沒有 `HurtBox`，無法被擊殺；唯一具備敵方 `HurtBox` 的 `Slime.tscn` 從未被任何關卡生成。因此 `F` / `K` 攻擊鍵在這三關裡打不到任何東西
+- **第三關的敵人是一擊死亡**：其 `HitBox` 的 `damage = 99`，而玩家 `HealthComponent` 的 `max_health = 5`，被衝刺撞到即死並觸發整關重載
 - **檢查點是純裝飾**：畫面上的門形物件不具復活功能。死亡一律整關重載，`GameManager.respawn_all()` 沒有任何呼叫者
 - 玩家 2 的 `p2_left` / `p2_right` 在 `project.godot` 中綁定的 physical keycode 有誤（對應到 Insert 與 Pause）。方向鍵之所以能用，是靠 `actors/players/PlayerBase.gd` 中針對玩家 2 硬寫的後備輸入路徑
 - 角色一旦持有護目鏡，互動鍵即被切換空間佔用，該角色無法再拾取其他物品
-- `interactables/CollapsingPlatform.gd`、`ui/HUD.tscn`、傳送門美術與平台圖集皆已存在但未被接上
+- **牽繩沒有任何視覺回饋**：兩人相距達 820 px 時往外的移動輸入會被直接歸零，畫面上不會有提示
+- **約 32 張 PNG 未被使用**：`LevelBase.platform()` 只載入 `platform_02/03` 與其 crimson 版本，因此 `platform_01`、`platform_04`～`platform_12` 及對應的 crimson 版本皆未使用；此外傳送門美術（7 張）、兩張平台圖集、史萊姆的 jump 動畫（5 張）也未被引用
+- `interactables/CollapsingPlatform.gd` 與 `ui/HUD.tscn` 是死路徑：`Level01._collapse()` 沒有呼叫者，`LevelBase.collapse_platforms` 永遠是空陣列；實際 HUD 由 `LevelBase._build_common()` 以程式建構，`ui/HUD.tscn` 沒有任何引用
+- `levels/Level03.gd.uid` 與 `levels/Level04.gd.uid` 內容相同（重複的 UID），每次 `godot --headless --import` 會出現一則匯入警告，不影響執行
 
 **尚未具備**
 - 無單人模式、無音量或按鍵設定（暫停面板只有繼續／回主選單／離開遊戲）
