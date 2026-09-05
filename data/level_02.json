@@ -1,0 +1,18 @@
+{
+  "spawn": {
+    "player_1": [560, 680],
+    "player_2": [630, 680]
+  },
+  "platforms": [
+    {"world": "shared", "position": [640, 760], "size": [900, 80]},
+    {"world": "normal", "position": [460, 620], "size": [220, 35]},
+    {"world": "alternate", "position": [820, 520], "size": [220, 35]},
+    {"world": "normal", "position": [460, 420], "size": [220, 35]},
+    {"world": "alternate", "position": [820, 320], "size": [220, 35]},
+    {"world": "normal", "position": [460, 220], "size": [220, 35]},
+    {"world": "alternate", "position": [820, 120], "size": [220, 35]},
+    {"world": "normal", "position": [460, 20], "size": [220, 35]},
+    {"world": "shared", "position": [820, -80], "size": [300, 40]}
+  ],
+  "exit_door": [820, -100]
+}
