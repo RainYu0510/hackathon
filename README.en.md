@@ -275,21 +275,15 @@ Full itemised list in **[CREDITS.md](CREDITS.md)**. Summary:
 
 This repository contains no API keys, tokens, passwords or credential files.
 
-## Team
-
-*Roles derived from the commit history. Names are given in Chinese, as the members write them.*
-
-| Name | Role |
-|---|---|
-| 余萬崧 | [`RainYu0510`](https://github.com/RainYu0510) — project initiation, repository setup, level 3 integration |
-| 許守呈 | [`0812tony96`](https://github.com/0812tony96) — base implementation, playable levels 1 and 2, character and environment art |
-| 林建良 | [`DecorousGoat914`](https://github.com/DecorousGoat914) — sound assets and the sound synthesis script |
-| 林秉昱 | [`kila606`](https://github.com/kila606) — export and release pipeline, tooling, project documentation |
-
 ## License
 
 **MIT License** — full text in [LICENSE](LICENSE) at the repository root.
 
 Copyright (c) 2026 水返腳(2).png (Team T045)
 
-The MIT license covers the source code. The origin and licensing status of art and audio assets is documented separately in [CREDITS.md](CREDITS.md).
+The MIT licence covers the **source code, level data and procedurally synthesised sound effects**. Two things it does not cover:
+
+- **The NoxCat character art** — a derivative of the official NOXCAT IP. Under section 7 of the NOXCAT IP Usage Guidelines those **rights are retained by NOXCAT**; publishing or commercialising the work after the event requires NOXCAT's prior written consent. This is an independent hackathon entry, not affiliated with or endorsed by NOXCAT
+- **`assets/fonts/NotoSansTC-Subset.ttf`** — SIL Open Font License 1.1, whose text ships alongside both release zips
+
+Per-item origin and licensing is documented in [CREDITS.md](CREDITS.md).

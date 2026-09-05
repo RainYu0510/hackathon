@@ -292,4 +292,9 @@ python tools/serve.py
 
 Copyright (c) 2026 水返腳(2).png (Team T045)
 
-程式碼適用上述 MIT 授權。美術與音訊資產的來源與授權狀態另見 [CREDITS.md](CREDITS.md)。
+MIT 涵蓋**程式碼、關卡資料與程式化合成音效**。有兩項例外，不適用 MIT：
+
+- **NoxCat 黑貓角色美術** —— NOXCAT 官方 IP 的衍生形象，依《NOXCAT IP Usage Guidelines》第七條，**權利由 NOXCAT 保留**；活動結束後如擬繼續發布或商業化，須另行取得 NOXCAT 書面同意。本作為獨立參賽作品，與 NOXCAT 無合作或背書關係
+- **`assets/fonts/NotoSansTC-Subset.ttf`** —— SIL Open Font License 1.1，條文隨兩個發布用 zip 一併散布
+
+逐項來源與授權狀態見 [CREDITS.md](CREDITS.md)。
