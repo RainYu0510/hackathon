@@ -12,7 +12,7 @@
     {"world": "normal", "position": [460, 220], "size": [220, 35]},
     {"world": "alternate", "position": [820, 120], "size": [220, 35]},
     {"world": "normal", "position": [460, 20], "size": [220, 35]},
-    {"world": "shared", "position": [820, -80], "size": [300, 40]}
+    {"world": "shared", "position": [820, -130], "size": [300, 40]}
   ],
-  "exit_door": [820, -100]
+  "exit_door": [820, -150]
 }

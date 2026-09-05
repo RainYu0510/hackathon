@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource path="res://ui/MainMenu.gd" type="Script" id="1"]
 [ext_resource path="res://ui/menu_theme.tres" type="Theme" id="2"]
+[ext_resource path="res://assets/dimensions/crimson/backgrounds/alternate_dimension_crimson.png" type="Texture2D" id="3"]
 
 ; 彈出視窗的樣式。不給 override 的話 PanelContainer 走 Godot 預設主題,
 ; 那是半透明的 —— 後面的標題與按鈕會透出來跟面板文字疊在一起。
@@ -31,6 +32,21 @@ script = ExtResource("1")
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.025, 0.035, 0.075, 1)
+; 選單背景圖:借用第三關(異空間·緋紅)場景的天際線美術,呼應「Riftbound」
+; 異空間裂隙的世界觀。KEEP_ASPECT_COVERED 讓圖片鋪滿整個視窗、依比例裁切,
+; 不會變形。
+[node name="BackgroundImage" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 6
+; 圖片本身很亮很花,直接疊文字會看不清楚,蓋一層半透明深色,
+; 讓氛圍還在但前景文字/按鈕維持對比度。
+[node name="Dim" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.03, 0.07, 0.68)
 [node name="Layout" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
