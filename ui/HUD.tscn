@@ -1,0 +1,7 @@
+[gd_scene format=3]
+[node name="HUD" type="CanvasLayer"]
+[node name="DebugLabel" type="Label" parent="."]
+offset_left = 18.0
+offset_top = 18.0
+text = "Debug HUD"
+

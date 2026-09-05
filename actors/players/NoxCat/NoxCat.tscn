@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource path="res://actors/players/NoxCat/NoxCat.gd" type="Script" id="1"]
+[ext_resource path="res://components/HitBox.gd" type="Script" id="2"]
+[ext_resource path="res://components/HurtBox.gd" type="Script" id="3"]
+[ext_resource path="res://components/HealthComponent.gd" type="Script" id="4"]
+[sub_resource type="CapsuleShape2D" id="Body"]
+radius = 18.0
+height = 58.0
+[sub_resource type="RectangleShape2D" id="Attack"]
+size = Vector2(54, 42)
+
+[node name="NoxCat" type="CharacterBody2D"]
+script = ExtResource("1")
+collision_layer = 2
+collision_mask = 1
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -25)
+shape = SubResource("Body")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -30)
+scale = Vector2(0.38, 0.38)
+[node name="HitBox" type="Area2D" parent="."]
+position = Vector2(40, -30)
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("2")
+team = "player"
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("Attack")
+[node name="HurtBox" type="Area2D" parent="."]
+position = Vector2(0, -25)
+collision_layer = 2
+collision_mask = 16
+script = ExtResource("3")
+team = "player"
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("Body")
+[node name="InteractionDetector" type="Area2D" parent="."]
+position = Vector2(0, -25)
+collision_layer = 0
+collision_mask = 32
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionDetector"]
+shape = SubResource("Attack")
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4")
