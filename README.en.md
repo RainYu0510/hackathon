@@ -1,7 +1,7 @@
 # NoxCat: Riftbound Co-op
 
 > Local two-player co-op puzzle platformer · Godot 4.7.2
-> Team: **水返腳(2).png** (team code T054)
+> Team: **水返腳(2).png** (team code T045) · Track: AI × Creativity
 > [中文說明](README.md)
 
 ---
@@ -121,7 +121,7 @@ Directory responsibilities:
 
 | Category | Technology / Service | Purpose |
 |---|---|---|
-| AI model | OpenAI ChatGPT Images 2.0 (API name `gpt-image-2`) | **Development-time asset production only**: generated contact sheets for characters, enemies, backgrounds and platforms, then sliced into frames by our own pipeline. The game calls no AI API at runtime |
+| AI model | OpenAI ChatGPT Images 2.0 (API name `gpt-image-2`) | **Development-time asset production only** (including regenerating the black cat from the official NOXCAT IP assets used as reference): generated contact sheets for characters, enemies, backgrounds and platforms, then sliced into frames by our own pipeline. The game calls no AI API at runtime |
 | Frontend | Godot Engine 4.7.2 stable + GDScript, `gl_compatibility` renderer | The game itself: rendering, input, 2D physics, level construction. The web build runs on WebAssembly + WebGL2 |
 | Backend | None | Purely local single-machine game — no server, no network requests, no database. Level data loads statically from `data/level_02.json` |
 | Sponsor technology | OpenAI ChatGPT (team's own account) | Development-time asset generation. The Pro plan and API credits offered by the organisers had not been provisioned by the submission deadline, so this was done on a team member's own account — no sponsor credits were used and no OpenAI API was called |
@@ -248,9 +248,10 @@ Full itemised list in **[CREDITS.md](CREDITS.md)**. Summary:
 |---|---|---|---|
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | Game engine; the web build includes engine-generated JS/WASM runtime code, also MIT |
 | Game source code | Written by the team | MIT (see [LICENSE](LICENSE)) | No third-party addons or plugins |
-| Art assets (153 PNGs) | Generated with OpenAI ChatGPT Images 2.0 (`gpt-image-2`), then sliced by our own pipeline | Output owned by the user under OpenAI's terms of use | Generated 2026-09-04 to 09-05; process notes in the [development log](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
+| **NoxCat (black cat) character art** | **Regenerated with ChatGPT Images 2.0 using the official NOXCAT IP asset pack (`NOXCAT IP_01`–`_04`) as reference input, then sliced by our own pipeline** | **Rights retained by NOXCAT** under section 7 of the NOXCAT IP Usage Guidelines — not covered by this project's MIT licence; publishing after the event needs NOXCAT's written consent | Core identity (black feline form, luminous green eyes, forehead goggles) preserved per section 3; the character is not renamed. Full disclosure in [CREDITS 3.1](CREDITS.md) |
+| Remaining art assets (CyberDog, slime, platforms, backgrounds, interactables) | Generated with OpenAI ChatGPT Images 2.0 (`gpt-image-2`), then sliced by our own pipeline | Output owned by the user under OpenAI's terms of use | Generated 2026-09-04 to 09-05; process notes in the [development log](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
 | Sound effects `dog_*.wav` (8, six of them in use) | Synthesised by [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js), a script written with OpenAI Codex | MIT (with this project) | Fully original — no sampled material |
-| Font `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc) (Google Fonts) | **SIL Open Font License 1.1** (text in [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)) | **The project's only third-party asset.** Subset down to 1.9 MB by [`tools/make_font_subset.py`](tools/make_font_subset.py). It has to be bundled because Godot's default font carries no CJK glyphs and the web build has no system font to fall back on — Chinese text would render as tofu boxes |
+| Font `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc) (Google Fonts) | **SIL Open Font License 1.1** (text in [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)) | **The only third-party asset embedded in the build besides the NOXCAT-derived character art.** Subset down to 1.9 MB by [`tools/make_font_subset.py`](tools/make_font_subset.py). It has to be bundled because Godot's default font carries no CJK glyphs and the web build has no system font to fall back on — Chinese text would render as tofu boxes |
 | Level data `data/level_02.json` | Made by the team | MIT (with this project) | No external datasets |
 
 This repository contains no API keys, tokens, passwords or credential files.
@@ -270,6 +271,6 @@ This repository contains no API keys, tokens, passwords or credential files.
 
 **MIT License** — full text in [LICENSE](LICENSE) at the repository root.
 
-Copyright (c) 2026 水返腳(2).png (Team T054)
+Copyright (c) 2026 水返腳(2).png (Team T045)
 
 The MIT license covers the source code. The origin and licensing status of art and audio assets is documented separately in [CREDITS.md](CREDITS.md).

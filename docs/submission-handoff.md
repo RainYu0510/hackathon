@@ -1,6 +1,6 @@
 # 繳交對接文件
 
-**NoxCat: Riftbound Co-op** · 隊伍 水返腳(2).png（T054）
+**NoxCat: Riftbound Co-op** · 隊伍 水返腳(2).png（T045）· 賽道 AI × Creativity
 
 這份文件是繳交前的對接清單。A、B 兩區塊是可直接複製使用的文案，C 需要你確認，D 是只有你能填的欄位。
 
@@ -87,7 +87,9 @@ https://www.youtube.com/watch?v=-BpBtdmxIQQ
 
 關於
 
-黑客松作品，隊伍 水返腳(2).png（T054）。以 Godot 4.7.2 製作，版本 v1.0.0。
+黑客松作品，隊伍 水返腳(2).png（T045）。以 Godot 4.7.2 製作，版本 v1.0.0。
+
+玩家一操作的黑貓 NoxCat 是 NOXCAT 官方 IP 的衍生形象，依 NOXCAT IP Usage Guidelines 以官方素材包為參考圖重新生成，權利由 NOXCAT 保留。本作為獨立參賽作品，與 NOXCAT 無合作或背書關係。
 
 程式碼採 MIT 授權。原始碼、開發日誌與完整的第三方素材授權揭露都在 GitHub：
 https://github.com/RainYu0510/hackathon
@@ -114,17 +116,18 @@ Viewport `1280×720`、勾 Fullscreen button、**不要勾 SharedArrayBuffer sup
 
 主辦方的檢核項要求揭露第三方套件、模型、資料與素材的來源及授權。你說「有用的才要」，所以下面是**實際進入成品或實際參與製作**的精簡版。
 
-### 建議保留（七項）
+### 建議保留（八項）
 
 | # | 項目 | 來源 | 授權 | 為什麼要列 |
 |---|---|---|---|---|
 | 1 | Godot Engine 4.7.2 stable | <https://godotengine.org> | MIT License | 遊戲引擎，且 Web 版直接包含引擎產生的 JS/WASM 執行期程式碼 |
-| 2 | Noto Sans TC（子集） | [Google Fonts](https://github.com/google/fonts/tree/main/ofl/notosanstc) | **SIL OFL 1.1** | **唯一內嵌進成品的第三方素材。** OFL 明文要求散布時附上授權條文，這一項不能省 |
-| 3 | OpenAI ChatGPT Images 2.0（`gpt-image-2`） | OpenAI | 依 OpenAI 使用條款，產出歸使用者 | 全部美術素材由它生成，屬於檢核項明確點名的「模型」 |
-| 4 | OpenAI ChatGPT | OpenAI | — | 開發期的設計討論與流程諮詢。主辦方的 Pro／API 額度未開通，使用團隊自有帳號 |
-| 5 | OpenAI Codex | OpenAI | — | 撰寫 `tools/generate_dog_sfx.js` 音效合成腳本 —— 遊戲裡聽到的每一個音效都源自它產出的程式碼 |
-| 6 | Anthropic Claude Code | Anthropic | — | 參與程式碼與文件撰寫，相關 commit 有 `Co-Authored-By` 標記，主動揭露比被發現好 |
-| 7 | 團隊自製：程式碼、`data/level_02.json`、8 個程式化合成音效（腳本由 Codex 協助撰寫，音檔為腳本輸出，非取樣素材） | 團隊 | MIT | 說明「哪些是我們自己做的」，這是清單的對照基準 |
+| 2 | **NOXCAT 官方 IP 素材（`NOXCAT IP_01`～`_04`）** | 賽道提供的 NOXCAT 官方素材包 | **NOXCAT 保留權利**（IP Usage Guidelines 第七條） | **玩家一的黑貓角色 NoxCat 是它的衍生形象**，以參考圖方式重新生成。這是進入成品的第三方 IP，一定要列。活動後續發布須另取得書面同意 |
+| 3 | Noto Sans TC（子集） | [Google Fonts](https://github.com/google/fonts/tree/main/ofl/notosanstc) | **SIL OFL 1.1** | 另一項內嵌進成品的第三方素材。OFL 明文要求散布時附上授權條文，這一項不能省 |
+| 4 | OpenAI ChatGPT Images 2.0（`gpt-image-2`） | OpenAI | 依 OpenAI 使用條款，產出歸使用者 | 全部美術素材由它生成（含 NOXCAT 角色的重新生成），屬於檢核項明確點名的「模型」 |
+| 5 | OpenAI ChatGPT | OpenAI | — | 開發期的設計討論與流程諮詢。主辦方的 Pro／API 額度未開通，使用團隊自有帳號 |
+| 6 | OpenAI Codex | OpenAI | — | 撰寫 `tools/generate_dog_sfx.js` 音效合成腳本 —— 遊戲裡聽到的每一個音效都源自它產出的程式碼 |
+| 7 | Anthropic Claude Code | Anthropic | — | 參與程式碼與文件撰寫，相關 commit 有 `Co-Authored-By` 標記，主動揭露比被發現好 |
+| 8 | 團隊自製：程式碼、關卡、CyberDog 與其餘美術、`data/level_02.json`、8 個程式化合成音效（腳本由 Codex 協助撰寫，音檔為腳本輸出，非取樣素材） | 團隊 | MIT | 說明「哪些是我們自己做的」，這是清單的對照基準 |
 
 ### 建議不列進精簡清單（三項，理由如下）
 

@@ -1,7 +1,7 @@
 # NoxCat: Riftbound Co-op
 
 > 雙人同機協力解謎平台遊戲 · Godot 4.7.2
-> 隊伍：**水返腳(2).png**（隊伍代號 T054）
+> 隊伍：**水返腳(2).png**（隊伍代號 T045）· 賽道：AI × Creativity
 > [English README](README.en.md)
 
 ---
@@ -121,7 +121,7 @@ flowchart TB
 
 | 類型 | 技術／服務 | 用途 |
 |---|---|---|
-| AI 模型 | OpenAI ChatGPT Images 2.0（API 名 `gpt-image-2`） | **僅開發期素材製作**：產出角色、敵人、背景、平台的接觸表，再以團隊自寫流程切成單幀。遊戲執行時不呼叫任何 AI API |
+| AI 模型 | OpenAI ChatGPT Images 2.0（API 名 `gpt-image-2`） | **僅開發期素材製作**（含以 NOXCAT 官方 IP 素材為參考圖重新生成黑貓角色）：產出角色、敵人、背景、平台的接觸表，再以團隊自寫流程切成單幀。遊戲執行時不呼叫任何 AI API |
 | 前端 | Godot Engine 4.7.2 stable + GDScript，渲染器 `gl_compatibility` | 遊戲本體：畫面、輸入、2D 物理、關卡建構。Web 版經 WebAssembly + WebGL2 執行 |
 | 後端 | 無 | 純本地單機遊戲，無伺服器、無網路請求、無資料庫。關卡資料以 `data/level_02.json` 靜態載入 |
 | Sponsor 技術 | OpenAI ChatGPT（團隊自有帳號） | 開發期素材生成。主辦方提供的 Pro 方案與 API 額度至繳交前尚未開通，本作以團隊自有帳號完成，未使用贊助額度，亦未呼叫 OpenAI API |
@@ -248,9 +248,10 @@ python tools/serve.py
 |---|---|---|---|
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | 遊戲引擎；Web 版包含引擎產生的 JS/WASM 執行期程式碼，同為 MIT |
 | 遊戲程式碼 | 團隊自行撰寫 | MIT（見 [LICENSE](LICENSE)） | 無任何第三方外掛或 addon |
-| 美術素材（153 張 PNG） | 以 OpenAI ChatGPT Images 2.0（`gpt-image-2`）生成後由團隊自寫流程切幀 | 依 OpenAI 使用條款，產出歸使用者所有 | 生成於 2026-09-04～05；流程紀錄見 [開發日誌](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
+| **NoxCat 黑貓角色美術** | **以賽道提供的 NOXCAT 官方 IP 素材包（`NOXCAT IP_01`～`_04`）為參考圖，用 ChatGPT Images 2.0 重新生成後切幀** | **NOXCAT 保留權利**，依《NOXCAT IP Usage Guidelines》第七條，不隨本專案 MIT 散布；活動後續發布須取得書面同意 | 核心識別（黑貓形體、螢光綠大眼、額前護目鏡）依規範第三條保留，角色未改名。詳見 [CREDITS 3.1](CREDITS.md) |
+| 其餘美術素材（CyberDog、史萊姆、平台、背景、互動物件） | 以 OpenAI ChatGPT Images 2.0（`gpt-image-2`）生成後由團隊自寫流程切幀 | 依 OpenAI 使用條款，產出歸使用者所有 | 生成於 2026-09-04～05；流程紀錄見 [開發日誌](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
 | 音效 `dog_*.wav`（8 個，其中 6 個實際使用） | 由 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 程式化合成，該腳本以 OpenAI Codex 協助撰寫 | MIT（隨本專案） | 完全原創，非取樣素材 |
-| 字型 `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc)（Google Fonts） | **SIL Open Font License 1.1**（條文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)） | **本專案唯一的第三方素材。** 由 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成 1.9 MB 的子集。內嵌的原因是 Godot 預設字型不含中文，Web 版沒有系統字型可 fallback，中文會變豆腐方塊 |
+| 字型 `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc)（Google Fonts） | **SIL Open Font License 1.1**（條文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)） | **除了 NOXCAT 衍生的角色美術之外，本專案唯一內嵌進成品的第三方素材。** 由 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成 1.9 MB 的子集。內嵌的原因是 Godot 預設字型不含中文，Web 版沒有系統字型可 fallback，中文會變豆腐方塊 |
 | 關卡資料 `data/level_02.json` | 團隊自製 | MIT（隨本專案） | 無外部資料集 |
 
 本儲存庫不包含任何 API 金鑰、Token、密碼或憑證檔案。
@@ -270,6 +271,6 @@ python tools/serve.py
 
 本專案採用 **MIT License**，完整條文見根目錄的 [LICENSE](LICENSE) 檔案。
 
-Copyright (c) 2026 水返腳(2).png (Team T054)
+Copyright (c) 2026 水返腳(2).png (Team T045)
 
 程式碼適用上述 MIT 授權。美術與音訊資產的來源與授權狀態另見 [CREDITS.md](CREDITS.md)。

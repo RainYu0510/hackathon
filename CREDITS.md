@@ -2,7 +2,7 @@
 
 本文件逐項列出 **NoxCat: Riftbound Co-op** 使用到的所有外部資源、其來源與授權狀態。
 
-隊伍：水返腳(2).png（T054）
+隊伍：水返腳(2).png（T045）
 最後更新：2026-09-05（對應 commit `b487b1e`）
 
 開發過程的逐次決策紀錄見 [`development-log/`](development-log/)（共 5 篇），其中素材製作流程見 [sprite pipeline 那篇](development-log/2026-09-04-sprite-pipeline-and-player-art.md)，最新的選單與敵人重做見 [這篇](development-log/2026-09-05-menu-exit-unify-slime-rework.md)。
@@ -36,7 +36,8 @@
 
 | 項目 | 數量 | 來源 | 授權 |
 |---|---|---|---|
-| 角色動畫（NoxCat、CyberDog） | — | AI 影像生成 + 團隊自寫切幀流程 | 見下方說明 |
+| 角色動畫 **NoxCat（黑貓）** | — | **以 NOXCAT 官方 IP 素材包為參考圖，AI 影像生成 + 團隊自寫切幀流程** | **NOXCAT 保留權利，見 3.1** |
+| 角色動畫 CyberDog（賽博狗） | — | AI 影像生成 + 團隊自寫切幀流程（原創角色） | 見下方說明 |
 | 敵人動畫（史萊姆，衝刺怪借用並上色） | — | 同上 | 同上 |
 | 空間背景、平台、傳送門 | — | 同上 | 同上 |
 | 互動物件圖示（護目鏡、鑰匙、門、完整牆面與裂開牆面） | — | 同上 | 同上 |
@@ -56,6 +57,28 @@
 依 OpenAI 使用條款，使用者對其輸入與模型產出的內容擁有權利。本專案的美術素材依此隨專案的 MIT 授權散布。
 
 > 中性說明：AI 生成內容在部分司法管轄區的著作權保護範圍仍有討論空間。此處揭露的是生成方式與時間的事實，不構成法律意見。
+
+### 3.1 NOXCAT 官方 IP 素材（第三方 IP）
+
+**玩家一操作的黑貓角色 NoxCat 是 NOXCAT 官方 IP 的衍生形象，不是本團隊的原創角色。**
+
+| 項目 | 內容 |
+|---|---|
+| 來源 | FUTUREMODE 2026 黑客松「AI × Creativity」賽道提供的 **NOXCAT 官方素材包** |
+| 參考檔案 | `NOXCAT IP_01`（正面半身）、`IP_02`（全身正反轉身）、`IP_03`（全身動作）、`IP_04`（頭部特寫） |
+| 使用方式 | 以上述四張作為**參考圖輸入**，透過 ChatGPT Images 2.0 重新生成本作所需的待機／移動／跳躍／攻擊／受擊／死亡／拾取護目鏡等動作幀，再由團隊切幀處理 |
+| 規範依據 | 《NOXCAT IP Usage Guidelines》第四條明訂允許重新繪製、依遊戲需求製作姿勢、配色調整、場景整合與遊戲資產化 |
+| 核心識別 | 依第三條保留：黑色貓形體、螢光綠大眼、額前綠鏡片護目鏡、螢光綠為強調色。角色名稱維持 `NoxCat`，未改名 |
+| 權利歸屬 | **依第七條，NOXCAT 素材及其可辨識之衍生形象，權利由 NOXCAT 保留**，不隨本專案的 MIT 授權散布 |
+| 活動後 | **活動結束後如擬繼續發布、上架或商業化，須另行取得 NOXCAT 書面同意**（第七條） |
+
+未使用之處，一併說明：
+
+- **未使用 LOGO 素材包**。團隊雖取得 `NOXCAT LOGO_01`～`_12`，但成品中沒有任何一張 NOXCAT 標識圖檔，主選單背景為團隊自製的異空間圖
+- **未訓練任何 LoRA 或微調模型**，因此不涉及第 6.2 條的模型權重散布限制
+- 賽博狗 CyberDog、史萊姆、平台、背景與互動物件皆為團隊原創，非 NOXCAT 衍生
+
+> 本作為獨立參賽作品，與 NOXCAT **不存在**合作、投資、背書或其他關係。
 
 **素材原始交付檔**
 
@@ -108,7 +131,7 @@ Pixabay Content License 允許免費用於商業與非商業用途、無需署�
 
 | 項目 | 來源 | 授權 | 備註 |
 |---|---|---|---|
-| `assets/fonts/NotoSansTC-Subset.ttf` | **Noto Sans TC**（Google Fonts）<br><https://github.com/google/fonts/tree/main/ofl/notosanstc> | **SIL Open Font License 1.1**<br>條文全文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt) | **這是本專案唯一的第三方素材。** 原字型 11.9 MB，經 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成子集後為 1.9 MB（保留 5748 個字形：Big5 常用字、ASCII、Latin-1 與常用標點），並將可變字重固定為 Regular。詳見下方說明 |
+| `assets/fonts/NotoSansTC-Subset.ttf` | **Noto Sans TC**（Google Fonts）<br><https://github.com/google/fonts/tree/main/ofl/notosanstc> | **SIL Open Font License 1.1**<br>條文全文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt) | **除了第 3.1 節的 NOXCAT 衍生角色美術之外，這是本專案唯一的第三方素材。** 原字型 11.9 MB，經 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成子集後為 1.9 MB（保留 5748 個字形：Big5 常用字、ASCII、Latin-1 與常用標點），並將可變字重固定為 Regular。詳見下方說明 |
 | `ui/menu_theme.tres` | 團隊自行製作 | MIT（隨本專案） | 主選單與暫停選單共用的 Godot `Theme` 資源。純設定資料（顏色、字級、邊框） |
 
 ### 為什麼需要內嵌字型
@@ -152,7 +175,7 @@ OFL 允許修改與再散布（切子集屬於修改），但要求：
 
 | 工具 | 用途 |
 |---|---|
-| OpenAI ChatGPT Images 2.0（`gpt-image-2`） | 美術素材生成（見第 3 節） |
+| OpenAI ChatGPT Images 2.0（`gpt-image-2`） | 美術素材生成，含以 NOXCAT 官方素材為參考圖重新生成黑貓角色（見第 3 節與 3.1） |
 | OpenAI ChatGPT | 開發期的設計討論、程式與素材處理流程諮詢 |
 | OpenAI Codex | 撰寫 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 音效合成腳本（見第 4.1 節） |
 | Anthropic Claude Code | 部分程式碼撰寫、專案文件與匯出流程協助。相關 commit 於訊息中標註 `Co-Authored-By` |
@@ -163,7 +186,8 @@ OFL 允許修改與再散布（切子集屬於修改），但要求：
 
 ## 授權總結
 
-- **程式碼、關卡資料、程式化合成音效**：MIT License，Copyright (c) 2026 水返腳(2).png (Team T054)，見 [LICENSE](LICENSE)
-- **美術素材**：AI 生成後由團隊後製，依 OpenAI 使用條款隨本專案 MIT 散布
+- **程式碼、關卡資料、程式化合成音效**：MIT License，Copyright (c) 2026 水返腳(2).png (Team T045)，見 [LICENSE](LICENSE)
+- **美術素材（原創部分）**：AI 生成後由團隊後製，依 OpenAI 使用條款隨本專案 MIT 散布
+- **NoxCat 黑貓角色**：NOXCAT 官方 IP 之衍生形象，**權利由 NOXCAT 保留**，不適用 MIT。活動後續發布須取得 NOXCAT 書面同意（見第 3.1 節）
 - **三個 Pixabay MP3**：Pixabay Content License，從未使用、從未散布，已於繳交前自儲存庫移除
 - **Godot Engine**：MIT License，版權歸 Godot Engine contributors

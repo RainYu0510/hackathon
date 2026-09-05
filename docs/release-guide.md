@@ -78,7 +78,9 @@ git push origin --delete v1.0.0    # 刪遠端的
 ## A-4. Release 說明文字（可直接複製貼上）
 
 ```markdown
-雙人同機協力解謎平台遊戲。隊伍：水返腳(2).png（T054）
+雙人同機協力解謎平台遊戲。隊伍：水返腳(2).png（T045）· 賽道 AI × Creativity
+
+玩家一的黑貓 NoxCat 是 NOXCAT 官方 IP 的衍生形象（依 NOXCAT IP Usage Guidelines 以官方素材包為參考圖重新生成，權利由 NOXCAT 保留）。本作為獨立參賽作品，與 NOXCAT 無合作或背書關係。
 
 ## 下載與執行
 

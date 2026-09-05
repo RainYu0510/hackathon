@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 水返腳(2).png (Team T054)
+Copyright (c) 2026 水返腳(2).png (Team T045)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,30 @@ SOFTWARE.
 
 ---
 
-The MIT License above covers the source code of this project.
+The MIT License above covers the source code, the level data and the
+procedurally synthesised sound effects of this project.
 
-Art and audio assets are documented separately in CREDITS.md, including their
-origin and licensing status. Three MP3 files under assets/audio/ have an
-unconfirmed origin; they are unused by the code and are excluded from every
-exported build.
+It does NOT cover the following, which are governed by separate terms:
+
+1. NOXCAT character assets and their recognisable derivatives
+
+   The player character "NoxCat" was produced for the FUTUREMODE 2026
+   Hackathon (AI x Creativity track) by regenerating artwork from the official
+   NOXCAT IP asset pack (NOXCAT IP_01 to IP_04) used as reference input.
+
+   Under section 7 of the NOXCAT IP Usage Guidelines, the NOXCAT assets and
+   their recognisable derivatives remain the property of NOXCAT; neither those
+   Guidelines nor the accompanying Licence transfer those rights. Continued
+   publication, distribution or commercialisation of work containing the
+   assets after the event requires NOXCAT's prior written consent.
+
+   This project is an independent hackathon entry. It is not affiliated with,
+   endorsed by, sponsored by or otherwise associated with NOXCAT.
+
+2. assets/fonts/NotoSansTC-Subset.ttf
+
+   SIL Open Font License 1.1. The full licence text is distributed alongside
+   the font as assets/fonts/NotoSansTC-OFL.txt.
+
+Full per-asset disclosure, including the AI tools used in production, is in
+CREDITS.md.
