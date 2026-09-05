@@ -57,19 +57,6 @@ func platform(parent: Node, pos: Vector2, size: Vector2, color: Color) -> Static
 	else:
 		var poly := Polygon2D.new(); poly.polygon = PackedVector2Array([-size/2,Vector2(size.x/2,-size.y/2),size/2,Vector2(-size.x/2,size.y/2)]); poly.color = color; body.add_child(poly)
 	var collision := CollisionShape2D.new(); var shape := RectangleShape2D.new(); shape.size = size; collision.shape = shape; body.add_child(collision)
-	# Bright walkable edge separates gameplay platforms from detailed scenery.
-	var glow := Line2D.new()
-	glow.points = PackedVector2Array([Vector2(-size.x/2.0, -size.y/2.0), Vector2(size.x/2.0, -size.y/2.0)])
-	glow.width = 10.0
-	glow.default_color = Color(1.0, 0.24, 0.08, 0.22) if alternate else Color(0.3, 1.0, 0.75, 0.22)
-	glow.z_index = 3
-	body.add_child(glow)
-	var edge := Line2D.new()
-	edge.points = glow.points
-	edge.width = 3.0
-	edge.default_color = Color("ff6a2a") if alternate else Color("70ffd0")
-	edge.z_index = 4
-	body.add_child(edge)
 	return body
 
 func dimension_background(parent: Node2D, alternate := false) -> void:
@@ -89,12 +76,16 @@ func dimension_background(parent: Node2D, alternate := false) -> void:
 
 func checkpoint(pos: Vector2) -> void:
 	var area := Area2D.new(); area.position = pos; area.collision_layer = 0; area.collision_mask = 2; area.set_script(load("res://interactables/Checkpoint.gd")); add_child(area)
-	var poly := Polygon2D.new(); poly.name = "Polygon2D"; poly.polygon = PackedVector2Array([Vector2(-12,-45),Vector2(12,-45),Vector2(12,0),Vector2(-12,0)]); poly.color=Color("50a0ff"); area.add_child(poly)
+	var poly := Polygon2D.new(); poly.name = "Polygon2D"; poly.visible = false; area.add_child(poly)
+	var door := Sprite2D.new(); door.texture = load("res://assets/interactables/locked_door.png"); door.position = Vector2(0,-52); door.scale = Vector2(140.0 / door.texture.get_width(), 140.0 / door.texture.get_height()); door.z_index = 3; area.add_child(door)
 	var cs := CollisionShape2D.new(); var shape:=RectangleShape2D.new(); shape.size=Vector2(45,100); cs.shape=shape; area.add_child(cs)
 
 func pickup(pos: Vector2, key_pickup := false) -> void:
 	var area:=Area2D.new(); area.position=pos; area.collision_layer=32; area.collision_mask=2; area.set_script(load("res://interactables/Key.gd" if key_pickup else "res://interactables/GogglePickup.gd")); add_child(area)
-	var poly:=Polygon2D.new(); poly.polygon=PackedVector2Array([Vector2(-18,-18),Vector2(18,-18),Vector2(18,18),Vector2(-18,18)]); poly.color=Color("ffe66d" if key_pickup else "5ff6ff"); area.add_child(poly)
+	if key_pickup:
+		var key := Sprite2D.new(); key.texture = load("res://assets/interactables/key_icon.png"); var key_scale := 150.0 / key.texture.get_width(); key.scale = Vector2(key_scale,key_scale); key.z_index = 3; area.add_child(key)
+	else:
+		var goggle := Sprite2D.new(); goggle.texture = load("res://assets/interactables/goggle_icon.png"); goggle.scale = Vector2(62.0 / goggle.texture.get_width(), 62.0 / goggle.texture.get_height()); goggle.z_index = 3; area.add_child(goggle)
 	var cs:=CollisionShape2D.new(); var shape:=RectangleShape2D.new(); shape.size=Vector2(65,65); cs.shape=shape; area.add_child(cs)
 
 func _on_key_collected() -> void:

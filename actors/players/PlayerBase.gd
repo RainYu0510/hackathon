@@ -144,8 +144,7 @@ func _on_died() -> void:
 	dead = true
 	hit_box.end_attack()
 	sprite.play("death")
-	await get_tree().create_timer(1.0).timeout
-	GameManager.respawn_all()
+	GameManager.restart_level()
 
 func respawn(at: Vector2) -> void:
 	global_position = at
