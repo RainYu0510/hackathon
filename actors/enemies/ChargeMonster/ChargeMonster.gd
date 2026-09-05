@@ -8,6 +8,10 @@ enum State { NORMAL, ANGRY, PREPARE_CHARGE, CHARGING, STUNNED, USED, DEAD }
 ## 0 = 不限距離(原本的行為)。設成正值時,目標超出這個距離就原地待機。
 ## 沒有這個的話怪物開場就會自己走到關卡另一端,「引誘」這個步驟會消失。
 @export var chase_range := 0.0
+## 平常(NORMAL)慢慢追蹤玩家的速度。
+@export var normal_speed := 45.0
+## 憤怒(ANGRY)時朝目標玩家衝去的速度,比平常追蹤快很多。
+@export var angry_speed := 160.0
 
 var state := State.NORMAL
 var charge_used := false
@@ -43,7 +47,8 @@ func _physics_process(delta: float) -> void:
 	target = _select_target()
 	if target and _within_chase_range(target):
 		var dx := target.global_position.x - global_position.x
-		velocity.x = sign(dx) * 70.0
+		var speed := angry_speed if state == State.ANGRY else normal_speed
+		velocity.x = sign(dx) * speed
 		sprite.flip_h = velocity.x < 0.0
 		if state == State.ANGRY and absf(dx) > 150.0 and absf(dx) < 650.0:
 			_prepare_charge(sign(dx))
@@ -91,6 +96,10 @@ func _finish_charge() -> void:
 	velocity.x = 0
 	hit_box.end_attack()
 	_apply_look()
+	collision_layer = 0
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.6)
+	tween.tween_callback(queue_free)
 
 func _on_dimension_changed(value: DimensionManager.Dimension) -> void:
 	if charge_used: return
