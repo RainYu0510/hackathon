@@ -92,7 +92,7 @@ func dimension_background(parent: Node2D, alternate := false) -> void:
 func checkpoint(pos: Vector2) -> void:
 	var area := Area2D.new(); area.position = pos; area.collision_layer = 0; area.collision_mask = 2; area.set_script(load("res://interactables/Checkpoint.gd")); add_child(area)
 	var poly := Polygon2D.new(); poly.name = "Polygon2D"; poly.visible = false; area.add_child(poly)
-	var door := Sprite2D.new(); door.texture = load("res://assets/interactables/locked_door.png"); door.position = Vector2(0,-49); door.scale = Vector2(140.0 / door.texture.get_width(), 140.0 / door.texture.get_height()); door.z_index = -1; area.add_child(door)
+	var door := Sprite2D.new(); door.texture = load("res://assets/interactables/locked_door.png"); door.position = Vector2(0,-27); door.scale = Vector2(140.0 / door.texture.get_width(), 140.0 / door.texture.get_height()); door.z_index = -1; area.add_child(door)
 	var cs := CollisionShape2D.new(); var shape:=RectangleShape2D.new(); shape.size=Vector2(45,100); cs.shape=shape; area.add_child(cs)
 
 func pickup(pos: Vector2, key_pickup := false) -> void:

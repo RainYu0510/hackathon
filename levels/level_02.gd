@@ -91,7 +91,7 @@ func _add_exit_door(position: Vector2) -> void:
 
 	var sprite := Sprite2D.new()
 	sprite.texture = load("res://assets/interactables/locked_door.png")
-	sprite.position = Vector2(0, -49)
+	sprite.position = Vector2(0, -33)
 	sprite.scale = Vector2(140.0 / sprite.texture.get_width(), 140.0 / sprite.texture.get_height())
 	sprite.z_index = -1
 	door.add_child(sprite)
