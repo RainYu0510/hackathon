@@ -94,3 +94,85 @@ func _on_key_collected() -> void:
 
 func _on_level_complete() -> void:
 	var message := Label.new(); message.text="LEVEL COMPLETE"; message.position=Vector2(465,250); message.add_theme_font_size_override("font_size",46); $HUD.add_child(message)
+
+## ─── 關卡串接接口 ───────────────────────────────────────────
+## 下一關的場景路徑。子類別在 build_level() 開頭設定。
+## 留空字串 = 目前沒有下一關,通關只顯示 LEVEL COMPLETE(R 可重玩)。
+var next_scene_path := ""
+var _transitioning := false   # one-shot,擋掉兩名玩家各觸發一次換場
+var _exit_armed := false
+var _exit_occupants: Array[Node] = []
+var _exit_hint: Label
+
+func go_to_next_level() -> void:
+	if _transitioning:
+		return
+	_transitioning = true
+	GameManager.complete_level()
+	if next_scene_path.is_empty():
+		return                 # 最後一關:只顯示 LEVEL COMPLETE
+	get_tree().call_deferred("change_scene_to_file", next_scene_path)
+
+## 建立出口觸發器。require_key 為 true 時必須先拿到鑰匙。
+## 過關條件是「兩名玩家都在門框內」—— 單人衝到終點不能把隊友丟下自己過關。
+func exit_trigger(pos: Vector2, size: Vector2, require_key := false) -> Area2D:
+	var area := Area2D.new(); area.position = pos; area.collision_layer = 0; area.collision_mask = 2
+	var cs := CollisionShape2D.new(); var rect := RectangleShape2D.new(); rect.size = size; cs.shape = rect; area.add_child(cs)
+	area.body_exited.connect(_on_exit_body_exited)
+	area.body_entered.connect(_on_exit_body_entered.bind(require_key))
+	add_child(area)
+	_exit_hint = Label.new(); _exit_hint.text = "Both players must be at the door"; _exit_hint.position = Vector2(400,560); _exit_hint.add_theme_font_size_override("font_size",20); _exit_hint.visible = false; $HUD.add_child(_exit_hint)
+	_arm_exit_when_clear(area)
+	return area
+
+## 出口若一開始就壓在玩家身上(第一關的門就是),等玩家離開才武裝;
+## 否則(出口在關卡另一端)兩個物理幀後直接武裝。
+## 這一步是必要的:Godot 對「生成時就重疊」的 body 會發 body_entered,
+## 而瞬移進 Area2D 同樣會發 —— 兩者都可能被誤判成「走進門」。
+func _arm_exit_when_clear(area: Area2D) -> void:
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	if not is_instance_valid(area):
+		return
+	for body in area.get_overlapping_bodies():
+		if body.is_in_group("player"):
+			return             # 有人壓在出口上 → 交給 body_exited 武裝
+	_exit_armed = true
+
+func _on_exit_body_exited(body: Node) -> void:
+	if not body.is_in_group("player"):
+		return
+	_exit_occupants.erase(body)
+	_exit_armed = true
+	_update_exit_hint()
+
+func _on_exit_body_entered(body: Node, require_key: bool) -> void:
+	if not body.is_in_group("player"):
+		return
+	if not _exit_occupants.has(body):
+		_exit_occupants.append(body)
+	_try_exit(require_key)
+
+## 兩名玩家都在門框內才換場。這裡不查 Area2D 的 get_overlapping_bodies() ——
+## 那個在 body_entered 發出的同一幀內不保證已經更新,所以自己維護佔用名單。
+func _try_exit(require_key: bool) -> void:
+	_update_exit_hint()
+	if _transitioning or not _exit_armed:
+		return
+	if require_key and not GameManager.has_key:
+		return
+	var players := get_tree().get_nodes_in_group("player")
+	if players.is_empty():
+		return
+	for player in players:
+		if not _exit_occupants.has(player):
+			return
+	go_to_next_level()
+
+## 有人站在出口、但人還沒到齊時給提示。沒有這個的話,一名玩家站在門口沒反應
+## 會被當成「換場壞掉」回報。
+func _update_exit_hint() -> void:
+	if not is_instance_valid(_exit_hint):
+		return
+	var total := get_tree().get_nodes_in_group("player").size()
+	_exit_hint.visible = _exit_occupants.size() > 0 and _exit_occupants.size() < total

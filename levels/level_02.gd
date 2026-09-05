@@ -1,7 +1,7 @@
 extends LevelBase
 
 const LEVEL_DATA_PATH := "res://data/level_02.json"
-const NEXT_LEVEL_PATH := "res://levels/Level03_PLACEHOLDER.tscn"
+const NEXT_LEVEL_PATH := "res://levels/Level03.tscn"
 
 var _exit_triggered := false
 
