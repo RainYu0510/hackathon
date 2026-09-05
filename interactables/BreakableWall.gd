@@ -18,7 +18,9 @@ func try_break(source: Node) -> bool:
 	if state == State.BROKEN or not source.is_in_group("charging_monster"): return false
 	state = State.BROKEN
 	$Polygon2D.visible = false
+	var wall_sprite := get_node_or_null("WallSprite") as Sprite2D
+	if wall_sprite:
+		wall_sprite.visible = false
 	$CollisionShape2D.set_deferred("disabled", true)
 	wall_broken.emit()
 	return true
-

@@ -2,6 +2,16 @@ class_name PlayerBase
 extends CharacterBody2D
 
 signal goggle_acquired(player: PlayerBase)
+
+const ACTION_SOUNDS: Dictionary[StringName, AudioStream] = {
+	&"run": preload("res://assets/audio/dog_run.wav"),
+	&"jump": preload("res://assets/audio/dog_jump.wav"),
+	&"attack": preload("res://assets/audio/dog_attack.wav"),
+	&"hit": preload("res://assets/audio/dog_hit.wav"),
+	&"death": preload("res://assets/audio/dog_death.wav"),
+	&"device": preload("res://assets/audio/dog_device.wav"),
+}
+
 @export var player_index := 0
 @export var asset_root := "res://assets/characters/noxcat"
 @export var special_animation := "goggle"
@@ -20,6 +30,8 @@ var gravity := 1325.0
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
 var fallback_jump_was_down := false
+var run_audio: AudioStreamPlayer
+var action_audio: AudioStreamPlayer
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hit_box: HitBox = $HitBox
 @onready var hurt_box: HurtBox = $HurtBox
@@ -27,6 +39,7 @@ var fallback_jump_was_down := false
 
 func _ready() -> void:
 	add_to_group("player")
+	_setup_audio()
 	_build_animations()
 	hurt_box.hurt.connect(_on_hurt)
 	health.died.connect(_on_died)
@@ -67,6 +80,7 @@ func _physics_process(delta: float) -> void:
 		jump_buffer_timer = jump_buffer_time
 	if jump_buffer_timer > 0.0 and coyote_timer > 0.0:
 		velocity.y = jump_velocity
+		_play_action_sound(&"jump")
 		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
 	if Input.is_action_just_pressed(prefix + "attack") and not attacking:
@@ -79,6 +93,7 @@ func _physics_process(delta: float) -> void:
 			_try_interact()
 	move_and_slide()
 	_update_animation()
+	_update_run_audio()
 
 func _would_exceed_separation(axis: float) -> bool:
 	if axis == 0.0:
@@ -103,6 +118,7 @@ func acquire_goggle() -> void:
 func _start_attack() -> void:
 	attacking = true
 	sprite.play("attack")
+	_play_action_sound(&"attack")
 	await get_tree().create_timer(0.12).timeout
 	if not dead:
 		hit_box.begin_attack()
@@ -112,6 +128,7 @@ func _start_attack() -> void:
 func _play_special() -> void:
 	special_playing = true
 	sprite.play(special_animation)
+	_play_action_sound(&"device")
 	if special_animation == "goggle":
 		_play_goggle_flash()
 
@@ -137,6 +154,7 @@ func _on_hurt(amount: int, _source: Node) -> void:
 		hurt_playing = true
 		hurt_box.invulnerable = true
 		sprite.play("hit")
+		_play_action_sound(&"hit")
 		await get_tree().create_timer(0.7).timeout
 		hurt_box.invulnerable = false
 
@@ -144,6 +162,8 @@ func _on_died() -> void:
 	dead = true
 	hit_box.end_attack()
 	sprite.play("death")
+	_stop_run_audio()
+	_play_action_sound(&"death")
 	GameManager.restart_level()
 
 func respawn(at: Vector2) -> void:
@@ -154,6 +174,7 @@ func respawn(at: Vector2) -> void:
 	hurt_playing = false
 	health.restore()
 	sprite.play("idle")
+	_stop_run_audio()
 
 func _on_animation_finished() -> void:
 	if sprite.animation == "attack": attacking = false
@@ -166,6 +187,34 @@ func _update_animation() -> void:
 	if not is_on_floor(): sprite.play("jump")
 	elif absf(velocity.x) > 15.0: sprite.play("run")
 	else: sprite.play("idle")
+
+func _setup_audio() -> void:
+	run_audio = AudioStreamPlayer.new()
+	run_audio.name = "RunAudio"
+	run_audio.stream = ACTION_SOUNDS[&"run"]
+	run_audio.volume_db = -8.0
+	add_child(run_audio)
+	action_audio = AudioStreamPlayer.new()
+	action_audio.name = "ActionAudio"
+	action_audio.volume_db = -5.0
+	add_child(action_audio)
+
+func _update_run_audio() -> void:
+	var should_play := not dead and is_on_floor() and absf(velocity.x) > 15.0
+	if should_play and not run_audio.playing:
+		run_audio.play()
+	elif not should_play:
+		_stop_run_audio()
+
+func _stop_run_audio() -> void:
+	if run_audio and run_audio.playing:
+		run_audio.stop()
+
+func _play_action_sound(sound_name: StringName) -> void:
+	if not action_audio or not ACTION_SOUNDS.has(sound_name):
+		return
+	action_audio.stream = ACTION_SOUNDS[sound_name]
+	action_audio.play()
 
 func _build_animations() -> void:
 	var frames := SpriteFrames.new()
