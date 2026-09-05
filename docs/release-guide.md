@@ -4,10 +4,12 @@
 
 打包好的檔案在 `build/` 目錄下：
 
-| 檔案 | 用途 |
-|---|---|
-| `build/NoxCat-Riftbound-Coop-v1.0.0-windows.zip` | 上傳到 GitHub Release |
-| `build/NoxCat-Riftbound-Coop-v1.0.0-web.zip` | 上傳到 itch.io |
+| 檔案 | 大小 | 上傳到哪裡 |
+|---|---|---|
+| `build/NoxCat-Riftbound-Coop-v1.0.0-windows.zip` | 約 55 MB | **GitHub Release** —— 下載即玩的桌面版，Release 的主角 |
+| `build/NoxCat-Riftbound-Coop-v1.0.0-web.zip` | 約 29 MB | **itch.io**（線上即玩）**與 GitHub Release 兩邊都放** —— 同一個檔案。附在 Release 裡是讓這個版本的 HTML5 建置有固定存檔，itch.io 頁面若出問題評審還有東西可拿 |
+
+所以 Release 的 Assets 會有**兩個** zip，itch.io 只需要 web 那一個。
 
 > `build/` 已列入 `.gitignore`，這兩個 zip 不會進版控 —— 它們是要「上傳」的產物，不是要「提交」的原始碼。
 
@@ -67,7 +69,7 @@ git push origin --delete v1.0.0    # 刪遠端的
    NoxCat: Riftbound Co-op v1.0.0 — 黑客松繳交版
    ```
 6. **Describe this release** 貼上 A-4 的說明草稿
-7. 把兩個 zip **拖曳**到「Attach binaries by dropping them here or selecting them」那一塊，等它上傳完（Windows 版約 50–60 MB，會跑一下）
+7. 把**兩個 zip**（windows 與 web）**拖曳**到「Attach binaries by dropping them here or selecting them」那一塊，等它上傳完（Windows 版 55 MB，會跑一下）
 8. **Set as the latest release** 保持勾選
 9. 點 **Publish release**
 
@@ -83,7 +85,7 @@ git push origin --delete v1.0.0    # 刪遠端的
 **Windows**：下載 `NoxCat-Riftbound-Coop-v1.0.0-windows.zip` → 解壓縮 → 雙擊 `NoxCat-Riftbound-Coop.exe`
 所有資源已內嵌在執行檔中，不需要安裝 Godot。
 
-**瀏覽器**：`NoxCat-Riftbound-Coop-v1.0.0-web.zip` 是 HTML5 版本，已上傳至 itch.io，可直接線上遊玩。
+**瀏覽器**：不想下載可以直接線上玩 —— <https://kila606.itch.io/2026fht04501>（同一份建置，也就是本頁附的 `NoxCat-Riftbound-Coop-v1.0.0-web.zip`）。
 
 ## 操作方式
 
@@ -165,11 +167,13 @@ MIT License。第三方素材與 AI 生成內容的來源揭露見 [CREDITS.md](
 
 ## B-5. 拿到網址後要回填
 
-itch.io 網址確定後，要更新三個地方：
+**本專案的頁面：<https://kila606.itch.io/2026fht04501>** —— 已經填進下列位置，不需要再動：
 
-1. `README.md` 的「作品展示」節 →「作品展示網址（選填）：」
-2. `README.en.md` 的 Showcase 節 → `Demo URL (optional):`
-3. GitHub Release 說明裡提到 itch.io 的那一句
+1. `README.md`「安裝與執行 → 方式一：瀏覽器直接玩」與「作品展示」節
+2. `README.en.md` 的 Option 1 與 Showcase 節
+3. 本文件 A-4 的 Release 說明草稿
+
+之後若換網址，以上四處要一起改，漏掉任何一處都會留下死連結。
 
 ---
 

@@ -24,6 +24,8 @@
 
 ## B. itch.io 頁面文案
 
+頁面：<https://kila606.itch.io/2026fht04501>
+
 itch.io 的描述欄支援 Markdown，可直接貼下面的內容。
 
 ### 短介紹（放在標題下方的 Short description 欄，一句話）
@@ -75,14 +77,18 @@ itch.io 的描述欄支援 Markdown，可直接貼下面的內容。
 
 ## 關於
 
-Godot 4.7.2 製作。程式碼採 MIT 授權，原始碼與完整的第三方素材授權揭露見 GitHub：
+黑客松作品，隊伍 **水返腳(2).png**（T054）。以 Godot 4.7.2 製作，版本 v1.0.0。
+
+程式碼採 MIT 授權。原始碼、開發日誌與完整的第三方素材授權揭露都在 GitHub：
 https://github.com/RainYu0510/hackathon
+
+角色與場景美術以 OpenAI ChatGPT Images 2.0 生成後由團隊切幀處理，音效由團隊撰寫的合成腳本程式化產生，中文字型為 Noto Sans TC 子集（SIL OFL 1.1）。
 ```
 
 ### 建議的 tags
 
 ```
-co-op, local-multiplayer, puzzle-platformer, godot, 2-player, dimension, singleplayer-no, pixel-art
+co-op, local-multiplayer, couch-co-op, puzzle-platformer, 2-player, asymmetric, dimensions, godot
 ```
 
 ### Embed 設定提醒
@@ -127,12 +133,11 @@ Viewport `1280×720`、勾 Fullscreen button、**不要勾 SharedArrayBuffer sup
 
 | # | 欄位 | 要填進哪裡 | 現在的狀態 |
 |---|---|---|---|
-| 1 | **itch.io 頁面網址** | 兩份 README 的「作品展示」節；`README.md` 的「方式一：瀏覽器直接玩」；GitHub Release 說明 | 現在是「*（建立後補上）*」 |
-| 2 | **評選影片連結** | 兩份 README 的「作品展示」節 | 現在是「*尚未產出*」 |
-| 3 | 3 個 mp3 的來源與授權 | `CREDITS.md` 第 4.2 節 | 標註為「來源待確認」。問到 DecorousGoat914 之後可以補，問不到就維持現狀（已排除於發布版本，不影響合規） |
-| 4 | 主辦方繳交表單的其他欄位 | 表單 | A 區塊的摘要、C 區塊的清單可直接用 |
+| 1 | **評選影片連結** | 兩份 README 的「作品展示」節 | 現在是「*尚未產出*」 |
+| 2 | 3 個 mp3 的來源與授權 | `CREDITS.md` 第 4.2 節 | 標註為「來源待確認」。問到 DecorousGoat914 之後可以補，問不到就維持現狀（已排除於發布版本，不影響合規） |
+| 3 | 主辦方繳交表單的其他欄位 | 表單 | A 區塊的摘要、C 區塊的清單可直接用 |
 
-拿到 itch.io 網址後告訴我，第 1 項我可以一次幫你填進所有位置（共 4 處，漏掉任何一處都會留下死連結）。
+itch.io 網址已於 2026-09-05 填入四處（兩份 README 的方式一／Option 1 與作品展示／Showcase 節、`docs/release-guide.md` 的 Release 說明草稿）：<https://kila606.itch.io/2026fht04501>
 
 ---
 
@@ -147,4 +152,4 @@ Viewport `1280×720`、勾 Fullscreen button、**不要勾 SharedArrayBuffer sup
 | 第三方來源與授權已揭露 | ✅ `CREDITS.md` + 本文件 C 區塊 |
 | 無 API Key／Token／密碼／個人資料 | ✅ 全樹掃描無命中 |
 | 可下載即玩的版本 | ⏳ 打包檔已產出，待你建立 GitHub Release |
-| 線上即玩 | ⏳ 待你建立 itch.io 頁面 |
+| 線上即玩 | ✅ <https://kila606.itch.io/2026fht04501> |

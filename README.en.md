@@ -134,7 +134,10 @@ Directory responsibilities:
 
 ### Option 1 — Play in a browser
 
-itch.io page: *(to be added once published)*
+itch.io page: <https://kila606.itch.io/2026fht04501>
+
+Open the link and press **Run game** — no download or install. The first load pulls about 29 MB, so give it a moment.
+This is a local two-player game: **two people share one keyboard**, and there is no single-player mode.
 
 ### Option 2 — Download the Windows build
 
@@ -202,7 +205,7 @@ The export configuration is version-controlled (`export_presets.cfg`), so these 
 
 ## Showcase
 
-- Demo URL (optional): *not yet published — to be added once the itch.io page is live*
+- Demo URL: <https://kila606.itch.io/2026fht04501> (itch.io, plays in the browser)
 - Judging video: *not yet produced*
 
 ## Limitations & Future Work
