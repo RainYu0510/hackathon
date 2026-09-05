@@ -275,16 +275,6 @@ python tools/serve.py
 
 本儲存庫不包含任何 API 金鑰、Token、密碼或憑證檔案。
 
-## 團隊成員
-
-*分工依 commit 紀錄整理。*
-
-| 姓名 | 分工 |
-|---|---|
-| 余萬崧 | [`RainYu0510`](https://github.com/RainYu0510) — 專案發起、儲存庫建立、第三關整合 |
-| 許守呈 | [`0812tony96`](https://github.com/0812tony96) — 遊戲基礎實作、第一二關可玩版、角色與場景美術素材 |
-| 林建良 | [`DecorousGoat914`](https://github.com/DecorousGoat914) — 音效素材與音效合成腳本 |
-| 林秉昱 | [`kila606`](https://github.com/kila606) — 匯出與發布流程、工具鏈、專案文件 |
 
 ## License
 
