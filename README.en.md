@@ -255,14 +255,14 @@ This repository contains no API keys, tokens, passwords or credential files.
 
 ## Team
 
-*Roles derived from the commit history; names to be filled in by the members themselves.*
+*Roles derived from the commit history. Names are given in Chinese, as the members write them.*
 
 | Name | Role |
 |---|---|
-| (TBD) | [`RainYu0510`](https://github.com/RainYu0510) — project initiation, repository setup, level 3 integration |
-| (TBD) | [`0812tony96`](https://github.com/0812tony96) — base implementation, playable levels 1 and 2, character and environment art |
-| (TBD) | [`DecorousGoat914`](https://github.com/DecorousGoat914) — sound assets and the sound synthesis script |
-| (TBD) | [`kila606`](https://github.com/kila606) — export and release pipeline, tooling, project documentation |
+| 余萬崧 | [`RainYu0510`](https://github.com/RainYu0510) — project initiation, repository setup, level 3 integration |
+| 許守呈 | [`0812tony96`](https://github.com/0812tony96) — base implementation, playable levels 1 and 2, character and environment art |
+| 林建良 | [`DecorousGoat914`](https://github.com/DecorousGoat914) — sound assets and the sound synthesis script |
+| 林秉昱 | [`kila606`](https://github.com/kila606) — export and release pipeline, tooling, project documentation |
 
 ## License
 
