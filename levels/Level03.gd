@@ -74,7 +74,10 @@ func _tall_wall(pos: Vector2, size: Vector2) -> void:
 func _make_wall(pos: Vector2, size: Vector2) -> StaticBody2D:
 	var body:=StaticBody2D.new(); body.position=pos; body.collision_layer=1; body.set_script(load("res://interactables/BreakableWall.gd"))
 	var half:=size*0.5
-	var poly:=Polygon2D.new(); poly.name="Polygon2D"; poly.polygon=PackedVector2Array([Vector2(-half.x,-half.y),Vector2(half.x,-half.y),half,Vector2(-half.x,half.y)]); body.add_child(poly)
+	var poly:=Polygon2D.new(); poly.name="Polygon2D"; poly.polygon=PackedVector2Array([Vector2(-half.x,-half.y),Vector2(half.x,-half.y),half,Vector2(-half.x,half.y)]); poly.visible=false; body.add_child(poly)
+	var sprite:=Sprite2D.new(); sprite.name="WallSprite"; sprite.texture=load("res://assets/interactables/cracked_wall_side.png")
+	var visual_size:=Vector2(size.x, size.y+12.0)
+	sprite.scale=Vector2(visual_size.x/sprite.texture.get_width(), visual_size.y/sprite.texture.get_height()); sprite.z_index=4; body.add_child(sprite)
 	var cs:=CollisionShape2D.new(); cs.name="CollisionShape2D"; var shape:=RectangleShape2D.new(); shape.size=size; cs.shape=shape; body.add_child(cs)
 	add_child(body)
 	return body
