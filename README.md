@@ -26,7 +26,7 @@
 - **過關要兩人到齊** —— 三關的出口都用同一套 `LevelBase.exit_trigger()`：兩名玩家都站進門框才過關，一人先到會顯示提示
 - **玩家動作音效** —— 跑步循環、跳躍、攻擊、受擊、死亡與裝置啟動各有音效，由程式化合成的 wav 驅動
 - **死亡整關重來** —— 沒有生命數，任一人死亡或墜落，1 秒後整關重載
-- **主選單與選關** —— 開始遊戲／**選擇關卡（第一／二／三關可直接進入）**／操作說明／離開；遊玩中按 `Esc` 暫停，可繼續、回主選單或離開遊戲
+- **主選單與選關** —— 開始遊戲／**選擇關卡（第一／二／三關可直接進入）**／操作說明／離開，背景沿用異空間的緋紅天際線美術並疊一層半透明深色維持文字對比；遊玩中按 `Esc` 暫停，可繼續、回主選單或離開遊戲
 - **除錯 HUD** —— **預設隱藏**，F1 才叫得出來，顯示目前空間、護目鏡持有者、鑰匙狀態與雙方血量。玩家畫面上只留操作提示列
 
 ## 系統架構
@@ -139,9 +139,9 @@ itch.io 頁面：*（建立後補上）*
 ### 方式二：下載 Windows 版
 
 ```
-1. 前往本儲存庫的 Releases 頁面，下載 NoxCat-v1.0.0-windows.zip
+1. 前往本儲存庫的 Releases 頁面，下載 NoxCat-Riftbound-Coop-v1.0.0-windows.zip
 2. 解壓縮
-3. 雙擊 NoxCat.exe
+3. 雙擊 NoxCat-Riftbound-Coop.exe
 ```
 執行檔已內嵌所有資源，解壓後單一 `.exe` 即可執行，不需安裝 Godot。
 
@@ -166,7 +166,7 @@ cd hackathon
 # Linux 使用者可用 tools/install_export_templates.sh 自動安裝
 
 godot --headless --import
-godot --headless --export-release "Windows Desktop" build/windows/NoxCat.exe
+godot --headless --export-release "Windows Desktop" build/windows/NoxCat-Riftbound-Coop.exe
 godot --headless --export-release "Web" build/web/index.html
 
 # 本機檢視 Web 版（http://127.0.0.1:8099）
@@ -223,7 +223,7 @@ python tools/serve.py
 - 玩家 2 的 `p2_left` / `p2_right` 在 `project.godot` 中綁定的 physical keycode 有誤（對應到 Insert 與 Pause）。方向鍵之所以能用，是靠 `actors/players/PlayerBase.gd` 中針對玩家 2 硬寫的後備輸入路徑
 - 角色一旦持有護目鏡，互動鍵即被切換空間佔用，該角色無法再拾取其他物品
 - **牽繩沒有任何視覺回饋**：兩人相距達 820 px 時往外的移動輸入會被直接歸零，畫面上不會有提示
-- **約 32 張 PNG 未被使用**：`LevelBase.platform()` 只載入 `platform_02/03` 與其 crimson 版本，因此 `platform_01`、`platform_04`～`platform_12` 及對應的 crimson 版本皆未使用；此外傳送門美術（7 張）、兩張平台圖集、史萊姆的 jump 動畫（5 張）也未被引用
+- **29 張 PNG 沒有被任何程式碼引用**：`LevelBase.platform()` 只載入 `platform_02/03` 與其 crimson 版本，所以其餘 10 種平台變體（兩個色系共 20 張）、傳送門美術（7 張）與兩張平台圖集都是閒置的。另有史萊姆的 attack／jump 共 10 張只被從未生成的 `Slime.tscn` 使用，實際遊戲中不會出現
 - `interactables/CollapsingPlatform.gd` 與 `ui/HUD.tscn` 是死路徑：`Level01._collapse()` 沒有呼叫者，`LevelBase.collapse_platforms` 永遠是空陣列；實際 HUD 由 `LevelBase._build_common()` 以程式建構，`ui/HUD.tscn` 沒有任何引用
 - **內嵌字型是子集**：`assets/fonts/NotoSansTC-Subset.ttf` 收錄 Big5 常用字（5748 個字形）。若日後新增的中文 UI 文字超出這個範圍，那些字在瀏覽器版會顯示成空框，且不會有任何錯誤訊息 —— 需重跑 `py tools/make_font_subset.py` 重新產生字型
 - `levels/Level03.gd.uid` 與 `levels/Level04.gd.uid` 內容相同（重複的 UID），每次 `godot --headless --import` 會出現一則匯入警告，不影響執行

@@ -6,8 +6,8 @@
 
 | 檔案 | 用途 |
 |---|---|
-| `build/NoxCat-v1.0.0-windows.zip` | 上傳到 GitHub Release |
-| `build/NoxCat-v1.0.0-web.zip` | 上傳到 itch.io |
+| `build/NoxCat-Riftbound-Coop-v1.0.0-windows.zip` | 上傳到 GitHub Release |
+| `build/NoxCat-Riftbound-Coop-v1.0.0-web.zip` | 上傳到 itch.io |
 
 > `build/` 已列入 `.gitignore`，這兩個 zip 不會進版控 —— 它們是要「上傳」的產物，不是要「提交」的原始碼。
 
@@ -80,10 +80,10 @@ git push origin --delete v1.0.0    # 刪遠端的
 
 ## 下載與執行
 
-**Windows**：下載 `NoxCat-v1.0.0-windows.zip` → 解壓縮 → 雙擊 `NoxCat.exe`
+**Windows**：下載 `NoxCat-Riftbound-Coop-v1.0.0-windows.zip` → 解壓縮 → 雙擊 `NoxCat-Riftbound-Coop.exe`
 所有資源已內嵌在執行檔中，不需要安裝 Godot。
 
-**瀏覽器**：`NoxCat-v1.0.0-web.zip` 是 HTML5 版本，已上傳至 itch.io，可直接線上遊玩。
+**瀏覽器**：`NoxCat-Riftbound-Coop-v1.0.0-web.zip` 是 HTML5 版本，已上傳至 itch.io，可直接線上遊玩。
 
 ## 操作方式
 
@@ -108,7 +108,7 @@ git push origin --delete v1.0.0    # 刪遠端的
 
 ## 已知限制
 
-遊戲目前不播放音效。完整的限制清單見 [README](https://github.com/RainYu0510/hackathon#限制與未來工作)。
+音效只覆蓋玩家動作（跑、跳、攻擊、受擊、死亡、裝置），沒有背景音樂。完整的限制清單見 [README](https://github.com/RainYu0510/hackathon#限制與未來工作)。
 
 ## 授權
 
@@ -135,7 +135,7 @@ MIT License。第三方素材與 AI 生成內容的來源揭露見 [CREDITS.md](
 
 ## B-2. 上傳 Web 版
 
-1. 在 **Uploads** 區塊點 **Upload files**，選 `build/NoxCat-v1.0.0-web.zip`
+1. 在 **Uploads** 區塊點 **Upload files**，選 `build/NoxCat-Riftbound-Coop-v1.0.0-web.zip`
 2. 上傳完成後，**勾選該檔案下方的 `This file will be played in the browser`**
    （沒勾這個，itch.io 只會把它當成一個下載用的 zip，不會執行）
 
@@ -184,14 +184,14 @@ mkdir -p build/web build/windows
 
 # 2. 重新匯出
 godot --headless --import
-godot --headless --export-release "Windows Desktop" build/windows/NoxCat.exe
+godot --headless --export-release "Windows Desktop" build/windows/NoxCat-Riftbound-Coop.exe
 godot --headless --export-release "Web" build/web/index.html
 ```
 
 ```powershell
 # 3. 打包（PowerShell）
-Compress-Archive -Path 'build\web\*'     -DestinationPath 'build\NoxCat-v1.0.0-web.zip'     -Force
-Compress-Archive -Path 'build\windows\*' -DestinationPath 'build\NoxCat-v1.0.0-windows.zip' -Force
+Compress-Archive -Path 'build\web\*'     -DestinationPath 'build\NoxCat-Riftbound-Coop-v1.0.0-web.zip'     -Force
+Compress-Archive -Path 'build\windows\*' -DestinationPath 'build\NoxCat-Riftbound-Coop-v1.0.0-windows.zip' -Force
 ```
 
 > **`build\web\*` 的星號是關鍵。** 有星號 → `index.html` 在 zip 的最上層，itch.io 找得到入口。沒星號 → zip 裡是一個 `web` 資料夾，itch.io 會顯示空白畫面。
@@ -208,7 +208,7 @@ python tools/serve.py
 - [ ] 匯出產物的時間戳比最新 commit 新（確認不是舊版）
 - [ ] Web zip 裡 `index.html` 在最上層
 - [ ] Web zip 裡沒有任何 `.mp3`（那三個來源待確認的音檔已由 `exclude_filter` 排除）
-- [ ] Windows zip 裡有 `NoxCat.exe` 與 `操作說明.txt`
+- [ ] Windows zip 裡有 `NoxCat-Riftbound-Coop.exe` 與 `操作說明.txt`
 - [ ] 本機跑起來看得到**主選單**
 - [ ] 無痕視窗能開 Release 頁面並下載
 - [ ] 無痕視窗能開 itch.io 頁面並遊玩

@@ -26,7 +26,7 @@ This project attacks that directly: **make the two players' abilities deliberate
 - **The exit takes both players** — all three levels use the same `LevelBase.exit_trigger()`: both players must stand in the doorway to advance, and whoever arrives first sees a hint
 - **Player action sounds** — run loop, jump, attack, hit, death and device activation each have a sound effect, driven by the procedurally synthesised wav files
 - **Death restarts the level** — no lives; if either player dies or falls, the whole level reloads after one second
-- **Main menu and level select** — start game / **level select (jump straight to level 1, 2 or 3)** / controls / quit; press `Esc` in game to pause, then resume, return to the menu or quit
+- **Main menu and level select** — start game / **level select (jump straight to level 1, 2 or 3)** / controls / quit, over a backdrop reusing the crimson alternate-space skyline with a translucent dark layer to keep text legible; press `Esc` in game to pause, then resume, return to the menu or quit
 - **Debug HUD** — **hidden by default**, press F1 to bring it up; shows the current space, goggle owner, key state and both players' HP. The play screen only keeps the control hints
 
 ## System Architecture
@@ -139,9 +139,9 @@ itch.io page: *(to be added once published)*
 ### Option 2 — Download the Windows build
 
 ```
-1. Go to this repository's Releases page and download NoxCat-v1.0.0-windows.zip
+1. Go to this repository's Releases page and download NoxCat-Riftbound-Coop-v1.0.0-windows.zip
 2. Extract it
-3. Double-click NoxCat.exe
+3. Double-click NoxCat-Riftbound-Coop.exe
 ```
 All resources are embedded in the executable — a single `.exe` after extraction, no Godot installation required.
 
@@ -166,7 +166,7 @@ cd hackathon
 # On Linux, tools/install_export_templates.sh automates this
 
 godot --headless --import
-godot --headless --export-release "Windows Desktop" build/windows/NoxCat.exe
+godot --headless --export-release "Windows Desktop" build/windows/NoxCat-Riftbound-Coop.exe
 godot --headless --export-release "Web" build/web/index.html
 
 # Preview the web build locally (http://127.0.0.1:8099)
@@ -223,7 +223,7 @@ Everything below was verified against the source, not assumed:
 - Player 2's `p2_left` / `p2_right` are bound to incorrect physical keycodes in `project.godot` (they map to Insert and Pause). The arrow keys work only through a hardcoded fallback input path for player 2 in `actors/players/PlayerBase.gd`
 - Once a character holds the goggles, the interact key is consumed by space switching and that character can no longer pick anything up
 - **The tether gives no visual feedback**: at 820 px apart, outward movement input is silently zeroed with nothing on screen to explain it
-- **Roughly 32 PNGs are unused**: `LevelBase.platform()` only ever loads `platform_02/03` and their crimson counterparts, leaving `platform_01` and `platform_04`–`platform_12` (both palettes) unreferenced, along with the portal art (7 files), two platform atlases and the slime's jump animation (5 files)
+- **29 PNGs are referenced by no code at all**: `LevelBase.platform()` only ever loads `platform_02/03` and their crimson counterparts, so the other ten platform variants (20 files across both palettes), the portal art (7 files) and the two platform atlases all sit idle. A further 10 files — the slime's attack and jump frames — are referenced only by the never-spawned `Slime.tscn` and so never appear in play
 - `interactables/CollapsingPlatform.gd` and `ui/HUD.tscn` are dead paths: `Level01._collapse()` has no callers and `LevelBase.collapse_platforms` is always empty; the real HUD is built in code by `LevelBase._build_common()`, and nothing references `ui/HUD.tscn`
 - **The bundled font is a subset**: `assets/fonts/NotoSansTC-Subset.ttf` covers the Big5 common-character set (5748 glyphs). Chinese UI text added later that falls outside that range will render as empty boxes in the browser build with no error of any kind — rerun `py tools/make_font_subset.py` to regenerate the font
 - `levels/Level03.gd.uid` and `levels/Level04.gd.uid` hold the same UID, which produces one import warning on every `godot --headless --import`. It does not affect runtime
