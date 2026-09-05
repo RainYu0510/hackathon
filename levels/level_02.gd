@@ -3,9 +3,8 @@ extends LevelBase
 const LEVEL_DATA_PATH := "res://data/level_02.json"
 const NEXT_LEVEL_PATH := "res://levels/Level03.tscn"
 
-var _exit_triggered := false
-
 func build_level() -> void:
+	next_scene_path = NEXT_LEVEL_PATH
 	var data := _load_level_data()
 	if data.is_empty():
 		return
@@ -85,13 +84,10 @@ func _build_vertical_background(parent: Node2D, alternate_world: bool) -> void:
 			parent.add_child(sprite)
 
 func _add_exit_door(position: Vector2) -> void:
-	var door := Area2D.new()
+	# 門走 LevelBase.exit_trigger():兩名玩家都在門框內才過關,一人先到會顯示提示。
+	# (原本這一關自己接 body_entered、單人進門就換場,跟第三關不一致,已移除。)
+	var door := exit_trigger(position, Vector2(100, 170))
 	door.name = "ExitDoor"
-	door.position = position
-	door.collision_layer = 0
-	door.collision_mask = 2
-	door.body_entered.connect(_on_exit_door_entered)
-	add_child(door)
 
 	var sprite := Sprite2D.new()
 	sprite.texture = load("res://assets/interactables/locked_door.png")
@@ -99,16 +95,3 @@ func _add_exit_door(position: Vector2) -> void:
 	sprite.scale = Vector2(140.0 / sprite.texture.get_width(), 140.0 / sprite.texture.get_height())
 	sprite.z_index = -1
 	door.add_child(sprite)
-
-	var collision := CollisionShape2D.new()
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(100, 170)
-	collision.shape = shape
-	door.add_child(collision)
-
-func _on_exit_door_entered(body: Node) -> void:
-	if _exit_triggered or not body.is_in_group("player"):
-		return
-	_exit_triggered = true
-	GameManager.complete_level()
-	get_tree().call_deferred("change_scene_to_file", NEXT_LEVEL_PATH)

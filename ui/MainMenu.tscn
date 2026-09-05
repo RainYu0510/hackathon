@@ -1,0 +1,128 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource path="res://ui/MainMenu.gd" type="Script" id="1"]
+[ext_resource path="res://ui/menu_theme.tres" type="Theme" id="2"]
+
+; 彈出視窗的樣式。不給 override 的話 PanelContainer 走 Godot 預設主題,
+; 那是半透明的 —— 後面的標題與按鈕會透出來跟面板文字疊在一起。
+; bg_color 的 alpha 必須是 1。
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.07, 0.09, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.62, 0.78, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2")
+script = ExtResource("1")
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.025, 0.035, 0.075, 1)
+[node name="Layout" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+offset_bottom = -60.0
+alignment = 1
+theme_override_constants/separation = 26
+[node name="Title" type="Label" parent="Layout"]
+text = "NoxCat: Riftbound Co-op"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(0.874, 0.988, 1, 1)
+[node name="Subtitle" type="Label" parent="Layout"]
+text = "雙人同機協力解謎平台遊戲 · 兩名玩家共用一台鍵盤"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.62, 0.68, 0.82, 1)
+[node name="Buttons" type="VBoxContainer" parent="Layout"]
+size_flags_horizontal = 4
+theme_override_constants/separation = 12
+[node name="StartButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(300, 50)
+text = "開始遊戲  START GAME"
+[node name="LevelButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(300, 50)
+text = "選擇關卡  LEVEL SELECT"
+[node name="ControlsButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(300, 50)
+text = "操作說明  CONTROLS"
+[node name="QuitButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(300, 50)
+text = "離開遊戲  QUIT"
+
+; ModalLayer 是「有沒有彈出視窗開著」的唯一真相來源。遮罩跟兩個面板都掛在它底下,
+; 一起開關,不會出現「遮罩開著但面板關著」這種走鐘狀態。
+[node name="ModalLayer" type="Control" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+[node name="Dimmer" type="ColorRect" parent="ModalLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.03, 0.07, 0.82)
+[node name="ControlsPanel" type="PanelContainer" parent="ModalLayer"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -330.0
+offset_top = -225.0
+offset_right = 330.0
+offset_bottom = 225.0
+theme_override_styles/panel = SubResource("PanelStyle")
+[node name="Content" type="VBoxContainer" parent="ModalLayer/ControlsPanel"]
+theme_override_constants/separation = 20
+[node name="ControlsLabel" type="Label" parent="ModalLayer/ControlsPanel/Content"]
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(0.874, 0.988, 1, 1)
+[node name="CloseButton" type="Button" parent="ModalLayer/ControlsPanel/Content"]
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(200, 44)
+text = "返回  BACK"
+[node name="LevelPanel" type="PanelContainer" parent="ModalLayer"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -200.0
+offset_right = 210.0
+offset_bottom = 200.0
+theme_override_styles/panel = SubResource("PanelStyle")
+[node name="Content" type="VBoxContainer" parent="ModalLayer/LevelPanel"]
+theme_override_constants/separation = 14
+[node name="LevelTitle" type="Label" parent="ModalLayer/LevelPanel/Content"]
+text = "選擇關卡"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.874, 0.988, 1, 1)
+[node name="Level1Button" type="Button" parent="ModalLayer/LevelPanel/Content"]
+custom_minimum_size = Vector2(0, 48)
+text = "第一關  LEVEL 1"
+[node name="Level2Button" type="Button" parent="ModalLayer/LevelPanel/Content"]
+custom_minimum_size = Vector2(0, 48)
+text = "第二關  LEVEL 2"
+[node name="Level3Button" type="Button" parent="ModalLayer/LevelPanel/Content"]
+custom_minimum_size = Vector2(0, 48)
+text = "第三關  LEVEL 3"
+[node name="LevelCloseButton" type="Button" parent="ModalLayer/LevelPanel/Content"]
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(200, 44)
+text = "返回  BACK"
