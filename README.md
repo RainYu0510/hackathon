@@ -110,7 +110,7 @@ flowchart TB
 | `components/` | 可組合元件：`HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | 鑰匙、護目鏡、可破壞牆、死亡區等互動物件 |
 | `systems/` | 空間世界切換與共用鏡頭 |
-| `assets/` | 美術（153 張 PNG）、音訊（8 wav + 3 mp3），以及 `fonts/` 內的中文子集字型與其 OFL 授權條文 |
+| `assets/` | 美術（153 張 PNG）、音訊（8 個 wav，全部程式化合成），以及 `fonts/` 內的中文子集字型與其 OFL 授權條文 |
 | `data/` | 靜態關卡資料（目前只有 `level_02.json`） |
 | `tools/` | 音效合成腳本、中文字型子集產生腳本、本機靜態伺服器、匯出範本安裝腳本 |
 | `docs/` | [發布指南](docs/release-guide.md)（GitHub Release 與 itch.io 上傳步驟），以及 `plan-v5.md`（**前一個原型的計畫文件，非現行架構**） |
@@ -126,7 +126,7 @@ flowchart TB
 | 後端 | 無 | 純本地單機遊戲，無伺服器、無網路請求、無資料庫。關卡資料以 `data/level_02.json` 靜態載入 |
 | Sponsor 技術 | OpenAI ChatGPT（團隊自有帳號） | 開發期素材生成。主辦方提供的 Pro 方案與 API 額度至繳交前尚未開通，本作以團隊自有帳號完成，未使用贊助額度，亦未呼叫 OpenAI API |
 | 發布平台 | itch.io（HTML5）、GitHub Releases | itch.io 提供點連結即玩的瀏覽器版；GitHub Releases 提供 Windows 單檔執行版 |
-| 開發工具鏈 | Node.js、Python 3 | `tools/generate_dog_sfx.js` 程式化合成音效；`tools/serve.py` 供 Web 匯出本機檢視 |
+| 開發工具鏈 | Node.js、Python 3 | `tools/generate_dog_sfx.js` 程式化合成音效（該腳本以 OpenAI Codex 協助撰寫）；`tools/serve.py` 供 Web 匯出本機檢視 |
 
 > 渲染器固定為 `gl_compatibility` 是硬需求而非偏好：**WebGL2 只支援 Compatibility**，而本作必須能在瀏覽器裡遊玩。因此不使用 glow / SSAO / SDFGI / 體積霧 / 螢幕空間反射。
 
@@ -206,7 +206,7 @@ python tools/serve.py
 ## 作品展示
 
 - 作品展示網址：<https://kila606.itch.io/2026fht04501>（itch.io，瀏覽器直接玩）
-- 評選影片：*尚未產出*
+- 評選影片：<https://www.youtube.com/watch?v=-BpBtdmxIQQ>
 
 ## 限制與未來工作
 
@@ -219,7 +219,7 @@ python tools/serve.py
 - 檔名有誤導性：`Level02_PLACEHOLDER.tscn` **不是**佔位關卡，它掛的是 `levels/level_02.gd`，是真正可玩的第二關
 
 **機制的不一致與未接上的部分**
-- **音效只覆蓋玩家動作**：`actors/players/PlayerBase.gd` 播放跑／跳／攻擊／受擊／死亡／裝置六種音效，**沒有背景音樂、沒有選單音效、沒有敵人音效**。兩個角色共用同一組 `dog_*` 音檔。`assets/audio/` 內尚有 `dog_idle.wav`、`dog_sfx_preview.wav` 與 3 個 mp3 未被任何程式碼引用
+- **音效只覆蓋玩家動作**：`actors/players/PlayerBase.gd` 播放跑／跳／攻擊／受擊／死亡／裝置六種音效，**沒有背景音樂、沒有選單音效、沒有敵人音效**。兩個角色共用同一組 `dog_*` 音檔。`assets/audio/` 內尚有 `dog_idle.wav` 與 `dog_sfx_preview.wav` 未被任何程式碼引用
 - **玩家攻擊在可玩關卡中沒有目標**：第三關的敵人（class 名為 `ChargeMonster`，借用史萊姆美術）沒有 `HurtBox`，無法被擊殺；唯一具備敵方 `HurtBox` 的 `Slime.tscn` 從未被任何關卡生成。因此 `F` / `K` 攻擊鍵在這三關裡打不到任何東西
 - **第三關的敵人是一擊死亡**：其 `HitBox` 的 `damage = 99`，而玩家 `HealthComponent` 的 `max_health = 5`，被衝刺撞到即死並觸發整關重載
 - **檢查點是純裝飾**：畫面上的門形物件不具復活功能。死亡一律整關重載，`GameManager.respawn_all()` 沒有任何呼叫者
@@ -249,8 +249,7 @@ python tools/serve.py
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | 遊戲引擎；Web 版包含引擎產生的 JS/WASM 執行期程式碼，同為 MIT |
 | 遊戲程式碼 | 團隊自行撰寫 | MIT（見 [LICENSE](LICENSE)） | 無任何第三方外掛或 addon |
 | 美術素材（153 張 PNG） | 以 OpenAI ChatGPT Images 2.0（`gpt-image-2`）生成後由團隊自寫流程切幀 | 依 OpenAI 使用條款，產出歸使用者所有 | 生成於 2026-09-04～05；流程紀錄見 [開發日誌](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
-| 音效 `dog_*.wav`（8 個，其中 6 個實際使用） | 由 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 程式化合成 | MIT（隨本專案） | 完全原創，非取樣素材 |
-| `jump.mp3` / `slime dead.mp3` / `slime walk.mp3` | **來源待確認** | **未確認** | 未被程式碼引用，且已在 `export_presets.cfg` 中排除，**不包含在任何發布版本內** |
+| 音效 `dog_*.wav`（8 個，其中 6 個實際使用） | 由 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 程式化合成，該腳本以 OpenAI Codex 協助撰寫 | MIT（隨本專案） | 完全原創，非取樣素材 |
 | 字型 `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc)（Google Fonts） | **SIL Open Font License 1.1**（條文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)） | **本專案唯一的第三方素材。** 由 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成 1.9 MB 的子集。內嵌的原因是 Godot 預設字型不含中文，Web 版沒有系統字型可 fallback，中文會變豆腐方塊 |
 | 關卡資料 `data/level_02.json` | 團隊自製 | MIT（隨本專案） | 無外部資料集 |
 

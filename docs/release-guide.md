@@ -87,6 +87,10 @@ git push origin --delete v1.0.0    # 刪遠端的
 
 **瀏覽器**：不想下載可以直接線上玩 —— <https://kila606.itch.io/2026fht04501>（同一份建置，也就是本頁附的 `NoxCat-Riftbound-Coop-v1.0.0-web.zip`）。
 
+## 影片介紹
+
+https://www.youtube.com/watch?v=-BpBtdmxIQQ
+
 ## 操作方式
 
 兩名玩家共用一台鍵盤。
@@ -211,7 +215,7 @@ python tools/serve.py
 
 - [ ] 匯出產物的時間戳比最新 commit 新（確認不是舊版）
 - [ ] Web zip 裡 `index.html` 在最上層
-- [ ] Web zip 裡沒有任何 `.mp3`（那三個來源待確認的音檔已由 `exclude_filter` 排除）
+- [ ] Web zip 裡沒有任何 `.mp3`（`exclude_filter` 的保險仍在；那三個 Pixabay 音檔已於 2026-09-05 自儲存庫移除）
 - [ ] Windows zip 裡有 `NoxCat-Riftbound-Coop.exe` 與 `操作說明.txt`
 - [ ] 本機跑起來看得到**主選單**
 - [ ] 無痕視窗能開 Release 頁面並下載

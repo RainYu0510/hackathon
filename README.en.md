@@ -110,7 +110,7 @@ Directory responsibilities:
 | `components/` | Composable components: `HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | Key, goggles, breakable wall, death zone and friends |
 | `systems/` | Space switching and the shared camera |
-| `assets/` | Art (153 PNGs), audio (8 wav + 3 mp3), and `fonts/` holding the Chinese subset font plus its OFL licence text |
+| `assets/` | Art (153 PNGs), audio (8 wav, all procedurally synthesised), and `fonts/` holding the Chinese subset font plus its OFL licence text |
 | `data/` | Static level data (currently only `level_02.json`) |
 | `tools/` | Sound synthesis script, Chinese font subsetter, local static server, export template installer |
 | `docs/` | [Release guide](docs/release-guide.md) (GitHub Release and itch.io upload steps), plus `plan-v5.md` (**a plan for an earlier prototype — not the current architecture**) |
@@ -126,7 +126,7 @@ Directory responsibilities:
 | Backend | None | Purely local single-machine game — no server, no network requests, no database. Level data loads statically from `data/level_02.json` |
 | Sponsor technology | OpenAI ChatGPT (team's own account) | Development-time asset generation. The Pro plan and API credits offered by the organisers had not been provisioned by the submission deadline, so this was done on a team member's own account — no sponsor credits were used and no OpenAI API was called |
 | Distribution | itch.io (HTML5), GitHub Releases | itch.io serves the click-and-play browser build; GitHub Releases carries the single-file Windows build |
-| Tooling | Node.js, Python 3 | `tools/generate_dog_sfx.js` synthesises the sound effects; `tools/serve.py` serves the web build locally |
+| Tooling | Node.js, Python 3 | `tools/generate_dog_sfx.js` synthesises the sound effects (the script was written with OpenAI Codex); `tools/serve.py` serves the web build locally |
 
 > The renderer is pinned to `gl_compatibility` out of necessity, not preference: **WebGL2 only supports Compatibility**, and this game must run in a browser. Consequently no glow, SSAO, SDFGI, volumetric fog or screen-space reflections are used.
 
@@ -206,7 +206,7 @@ The export configuration is version-controlled (`export_presets.cfg`), so these 
 ## Showcase
 
 - Demo URL: <https://kila606.itch.io/2026fht04501> (itch.io, plays in the browser)
-- Judging video: *not yet produced*
+- Judging video: <https://www.youtube.com/watch?v=-BpBtdmxIQQ>
 
 ## Limitations & Future Work
 
@@ -219,7 +219,7 @@ Everything below was verified against the source, not assumed:
 - The filenames mislead: `Level02_PLACEHOLDER.tscn` is **not** a placeholder — it carries `levels/level_02.gd`, the real playable level 2
 
 **Inconsistencies and unwired content**
-- **Audio covers player actions only**: `actors/players/PlayerBase.gd` plays run / jump / attack / hit / death / device sounds. There is **no background music, no menu audio and no enemy audio**. Both characters share the same `dog_*` clips, and `dog_idle.wav`, `dog_sfx_preview.wav` and the three MP3s remain unreferenced by any code
+- **Audio covers player actions only**: `actors/players/PlayerBase.gd` plays run / jump / attack / hit / death / device sounds. There is **no background music, no menu audio and no enemy audio**. Both characters share the same `dog_*` clips, and `dog_idle.wav` and `dog_sfx_preview.wav` remain unreferenced by any code
 - **Player attacks have no target in the playable levels**: the level 3 enemy (class `ChargeMonster`, drawn with the slime art) has no `HurtBox` and cannot be killed, and `Slime.tscn` — the only entity carrying an enemy `HurtBox` — is never spawned by any level. So `F` / `K` hit nothing across all three levels
 - **The level 3 enemy is a one-hit kill**: its `HitBox` has `damage = 99` against a player `HealthComponent` with `max_health = 5`, so being caught by a charge kills instantly and reloads the level
 - **Checkpoints are purely decorative**: the door-shaped objects do not act as respawn points. Death always reloads the level, and `GameManager.respawn_all()` has no callers
@@ -249,8 +249,7 @@ Full itemised list in **[CREDITS.md](CREDITS.md)**. Summary:
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | Game engine; the web build includes engine-generated JS/WASM runtime code, also MIT |
 | Game source code | Written by the team | MIT (see [LICENSE](LICENSE)) | No third-party addons or plugins |
 | Art assets (153 PNGs) | Generated with OpenAI ChatGPT Images 2.0 (`gpt-image-2`), then sliced by our own pipeline | Output owned by the user under OpenAI's terms of use | Generated 2026-09-04 to 09-05; process notes in the [development log](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
-| Sound effects `dog_*.wav` (8, six of them in use) | Synthesised by [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) | MIT (with this project) | Fully original — no sampled material |
-| `jump.mp3` / `slime dead.mp3` / `slime walk.mp3` | **Origin unconfirmed** | **Unconfirmed** | Unreferenced by any code and excluded via `export_presets.cfg`; **not included in any released build** |
+| Sound effects `dog_*.wav` (8, six of them in use) | Synthesised by [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js), a script written with OpenAI Codex | MIT (with this project) | Fully original — no sampled material |
 | Font `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc) (Google Fonts) | **SIL Open Font License 1.1** (text in [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)) | **The project's only third-party asset.** Subset down to 1.9 MB by [`tools/make_font_subset.py`](tools/make_font_subset.py). It has to be bundled because Godot's default font carries no CJK glyphs and the web build has no system font to fall back on — Chinese text would render as tofu boxes |
 | Level data `data/level_02.json` | Made by the team | MIT (with this project) | No external datasets |
 

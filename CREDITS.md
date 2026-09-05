@@ -80,25 +80,29 @@
 
 這些檔案由一支 Node.js 腳本逐位元組寫出：手寫 RIFF/WAVE 標頭、以線性同餘產生器製造雜訊、搭配正弦包絡塑形，輸出 16-bit 單聲道 44.1 kHz PCM。**完全原創，未使用任何取樣素材或音效庫。** 執行 `node tools/generate_dog_sfx.js` 即可重新產生。
 
+該腳本由隊員（GitHub `DecorousGoat914`）在 **OpenAI Codex** 協助下撰寫，與這 8 個 WAV 於同一個 commit（`1279c94`）提交。
+
+「這 8 個檔案全部出自這支腳本」是可查證的：腳本的 `makeWav()` 配置 `44 + floor(秒數 × 44100) × 2` bytes，用腳本內宣告的秒數反推理論檔案大小，與磁碟上的實際大小逐位元組相符 —— `dog_idle` 0.8 秒 / 70604 bytes、`dog_run` 與 `dog_jump` 0.42 秒 / 37088 bytes、`dog_attack` 0.36 秒 / 31796 bytes、`dog_device` 0.55 秒 / 48554 bytes、`dog_hit` 0.27 秒 / 23858 bytes、`dog_death` 0.85 秒 / 75014 bytes。八個檔案的標頭也一致為 1 聲道 / 44100 Hz / 16-bit、44 bytes 裸標頭，正是 `makeWav()` 的輸出格式。
+
 其中 6 個（`dog_run`、`dog_jump`、`dog_attack`、`dog_hit`、`dog_death`、`dog_device`）已由 `actors/players/PlayerBase.gd` 實際播放；`dog_idle.wav` 與 `dog_sfx_preview.wav` 目前未被引用。
 
-### 4.2 來源待確認的音效（3 個 MP3）
+### 4.2 已移除的第三方音效（3 個 MP3，來自 Pixabay）
 
-| 檔案 | 來源 | 授權 | 處置 |
+| 檔案 | 來源 | 授權 | 現況 |
 |---|---|---|---|
-| `assets/audio/jump.mp3` | **未確認** | **未確認** | 已排除於所有發布版本 |
-| `assets/audio/slime dead.mp3` | **未確認** | **未確認** | 同上 |
-| `assets/audio/slime walk.mp3` | **未確認** | **未確認** | 同上 |
+| `assets/audio/jump.mp3` | [Pixabay](https://pixabay.com/) | Pixabay Content License | **已自儲存庫移除** |
+| `assets/audio/slime dead.mp3` | [Pixabay](https://pixabay.com/) | Pixabay Content License | 同上 |
+| `assets/audio/slime walk.mp3` | [Pixabay](https://pixabay.com/) | Pixabay Content License | 同上 |
 
-這三個檔案由隊員（GitHub `DecorousGoat914`）經 GitHub 網頁介面上傳，檔案本身無內嵌 metadata，上傳時亦未附帶來源或授權說明。團隊目前無法確認其出處。
+這三個檔案由隊員（GitHub `DecorousGoat914`）自 Pixabay 取得後，經 GitHub 網頁介面上傳（commit `d0778de` 與 `9ea5b9d`）。檔案本身沒有內嵌 metadata，因此無法回溯到個別的素材頁面網址。
 
-採取的處置：
+Pixabay Content License 允許免費用於商業與非商業用途、無需署名，但不得將素材本身原樣轉售或再散布。本專案的處置是：
 
-1. **不隱瞞** —— 在此誠實揭露其狀態為未確認
-2. **不使用** —— 專案程式碼中沒有任何一處引用這三個檔案。遊戲實際播放的音效全部來自程式化合成的 `dog_*.wav`
-3. **不散布** —— `export_presets.cfg` 的 `exclude_filter` 設為 `*.mp3`，因此它們**不會被打包進任何匯出的執行檔或 Web 版本**
+1. **從未使用** —— 專案程式碼中沒有任何一處引用這三個檔案。遊戲實際播放的音效全部來自 4.1 節程式化合成的 `dog_*.wav`
+2. **從未散布** —— `export_presets.cfg` 的 `exclude_filter` 設為 `*.mp3`，它們不曾被打包進任何匯出的執行檔或 Web 版本（打包後的 pck 內 mp3 數量為 0，已實際驗證）
+3. **已移除** —— 既然沒有使用，繳交前已將這三個檔案自工作樹刪除，避免散布未使用的第三方素材
 
-來源與授權確認之前，這三個檔案僅存在於原始碼樹中，不進入任何發布產物。
+`exclude_filter="*.mp3"` 保留在 `export_presets.cfg` 中，作為日後誤加 mp3 的保險。git 歷史中仍可見這些檔案，此節即為其紀錄。
 
 ## 5. 字型與 UI 主題
 
@@ -148,7 +152,9 @@ OFL 允許修改與再散布（切子集屬於修改），但要求：
 
 | 工具 | 用途 |
 |---|---|
-| OpenAI ChatGPT（ChatGPT Images 2.0 / `gpt-image-2`） | 美術素材生成（見第 3 節） |
+| OpenAI ChatGPT Images 2.0（`gpt-image-2`） | 美術素材生成（見第 3 節） |
+| OpenAI ChatGPT | 開發期的設計討論、程式與素材處理流程諮詢 |
+| OpenAI Codex | 撰寫 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 音效合成腳本（見第 4.1 節） |
 | Anthropic Claude Code | 部分程式碼撰寫、專案文件與匯出流程協助。相關 commit 於訊息中標註 `Co-Authored-By` |
 
 主辦方原訂提供的 OpenAI Pro 方案與 API 額度至繳交前尚未開通，因此上述素材生成使用團隊成員的自有帳號完成，未動用贊助額度，遊戲執行時亦未呼叫任何 OpenAI API。
@@ -159,5 +165,5 @@ OFL 允許修改與再散布（切子集屬於修改），但要求：
 
 - **程式碼、關卡資料、程式化合成音效**：MIT License，Copyright (c) 2026 水返腳(2).png (Team T054)，見 [LICENSE](LICENSE)
 - **美術素材**：AI 生成後由團隊後製，依 OpenAI 使用條款隨本專案 MIT 散布
-- **三個 MP3**：來源未確認，未使用、未散布
+- **三個 Pixabay MP3**：Pixabay Content License，從未使用、從未散布，已於繳交前自儲存庫移除
 - **Godot Engine**：MIT License，版權歸 Godot Engine contributors

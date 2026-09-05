@@ -80,6 +80,11 @@
 ‧ 沒有存檔
 
 
+影片介紹
+
+https://www.youtube.com/watch?v=-BpBtdmxIQQ
+
+
 關於
 
 黑客松作品，隊伍 水返腳(2).png（T054）。以 Godot 4.7.2 製作，版本 v1.0.0。
@@ -109,29 +114,31 @@ Viewport `1280×720`、勾 Fullscreen button、**不要勾 SharedArrayBuffer sup
 
 主辦方的檢核項要求揭露第三方套件、模型、資料與素材的來源及授權。你說「有用的才要」，所以下面是**實際進入成品或實際參與製作**的精簡版。
 
-### 建議保留（五項）
+### 建議保留（七項）
 
 | # | 項目 | 來源 | 授權 | 為什麼要列 |
 |---|---|---|---|---|
 | 1 | Godot Engine 4.7.2 stable | <https://godotengine.org> | MIT License | 遊戲引擎，且 Web 版直接包含引擎產生的 JS/WASM 執行期程式碼 |
 | 2 | Noto Sans TC（子集） | [Google Fonts](https://github.com/google/fonts/tree/main/ofl/notosanstc) | **SIL OFL 1.1** | **唯一內嵌進成品的第三方素材。** OFL 明文要求散布時附上授權條文，這一項不能省 |
 | 3 | OpenAI ChatGPT Images 2.0（`gpt-image-2`） | OpenAI | 依 OpenAI 使用條款，產出歸使用者 | 全部美術素材由它生成，屬於檢核項明確點名的「模型」 |
-| 4 | Anthropic Claude Code | Anthropic | — | 參與程式碼與文件撰寫，相關 commit 有 `Co-Authored-By` 標記，主動揭露比被發現好 |
-| 5 | 團隊自製：程式碼、`data/level_02.json`、8 個程式化合成音效 | 團隊 | MIT | 說明「哪些是我們自己做的」，這是清單的對照基準 |
+| 4 | OpenAI ChatGPT | OpenAI | — | 開發期的設計討論與流程諮詢。主辦方的 Pro／API 額度未開通，使用團隊自有帳號 |
+| 5 | OpenAI Codex | OpenAI | — | 撰寫 `tools/generate_dog_sfx.js` 音效合成腳本 —— 遊戲裡聽到的每一個音效都源自它產出的程式碼 |
+| 6 | Anthropic Claude Code | Anthropic | — | 參與程式碼與文件撰寫，相關 commit 有 `Co-Authored-By` 標記，主動揭露比被發現好 |
+| 7 | 團隊自製：程式碼、`data/level_02.json`、8 個程式化合成音效（腳本由 Codex 協助撰寫，音檔為腳本輸出，非取樣素材） | 團隊 | MIT | 說明「哪些是我們自己做的」，這是清單的對照基準 |
 
 ### 建議不列進精簡清單（三項，理由如下）
 
 | 項目 | 為什麼建議不列 |
 |---|---|
-| 3 個來源待確認的 mp3（`jump.mp3`、`slime dead.mp3`、`slime walk.mp3`） | 程式碼完全沒有引用，且 `export_presets.cfg` 的 `exclude_filter` 已把它們排除，**不存在於任何發布版本中**。列進精簡清單會讓評審以為成品用了來源不明的素材，反而扣分。**但 `CREDITS.md` 第 4.2 節必須保留完整揭露** —— 它們還在原始碼樹裡，隱瞞才是問題 |
+| 3 個 Pixabay mp3（`jump.mp3`、`slime dead.mp3`、`slime walk.mp3`） | 來源已確認為 [Pixabay](https://pixabay.com/)（Pixabay Content License，免費商用、無需署名）。程式碼從未引用，`exclude_filter` 也讓它們從未進入任何發布版本，**且已於繳交前自儲存庫刪除**。既然成品沒有用到、也不再散布，就不列進給主辦方的精簡清單。**`CREDITS.md` 第 4.2 節保留完整紀錄** —— git 歷史裡還看得到，寫清楚比刪乾淨更重要 |
 | 根目錄 5 個素材原始 zip | 那是我們自己 AI 生成流程的原始交付包，內容已解壓到 `assets/`，不是第三方取得的素材。歸在第 3 項底下就夠了 |
 | 29 張未被引用的 PNG、Godot 內建預設字型 | 前者是我們自己生成的閒置素材、後者未實際使用（已被內嵌字型取代），都不構成第三方授權事項 |
 
-### 你要決定的
+### 已定案（2026-09-05）
 
-- [ ] 五項保留清單是否照這樣交？
-- [ ] 第 4 項（Claude Code）要不要列？我建議列 —— 有些主辦方明確要求揭露 AI 協作，且 commit 訊息裡已有標記，不列反而像隱瞞
-- [ ] 三個 mp3 是否照建議「精簡清單不列、CREDITS 保留揭露」處理？
+- [x] 七項保留清單照這樣交
+- [x] AI 協作全部列出：ChatGPT Images 2.0、ChatGPT、Codex、Claude Code 四項都在清單內
+- [x] 三個 mp3 的來源確認為 Pixabay；精簡清單不列、`CREDITS.md` 保留紀錄，並將檔案自儲存庫移除
 
 完整詳細版一律以 [CREDITS.md](../CREDITS.md) 為準，這份只是給主辦方表單用的濃縮版。
 
@@ -141,9 +148,7 @@ Viewport `1280×720`、勾 Fullscreen button、**不要勾 SharedArrayBuffer sup
 
 | # | 欄位 | 要填進哪裡 | 現在的狀態 |
 |---|---|---|---|
-| 1 | **評選影片連結** | 兩份 README 的「作品展示」節 | 現在是「*尚未產出*」 |
-| 2 | 3 個 mp3 的來源與授權 | `CREDITS.md` 第 4.2 節 | 標註為「來源待確認」。問到 DecorousGoat914 之後可以補，問不到就維持現狀（已排除於發布版本，不影響合規） |
-| 3 | 主辦方繳交表單的其他欄位 | 表單 | A 區塊的摘要、C 區塊的清單可直接用 |
+| 1 | 主辦方繳交表單的其他欄位 | 表單 | A 區塊的摘要、C 區塊的清單可直接用 |
 
 itch.io 網址已於 2026-09-05 填入四處（兩份 README 的方式一／Option 1 與作品展示／Showcase 節、`docs/release-guide.md` 的 Release 說明草稿）：<https://kila606.itch.io/2026fht04501>
 
@@ -161,3 +166,4 @@ itch.io 網址已於 2026-09-05 填入四處（兩份 README 的方式一／Opti
 | 無 API Key／Token／密碼／個人資料 | ✅ 全樹掃描無命中 |
 | 可下載即玩的版本 | ⏳ 打包檔已產出，待你建立 GitHub Release |
 | 線上即玩 | ✅ <https://kila606.itch.io/2026fht04501> |
+| 評選影片 | ✅ <https://www.youtube.com/watch?v=-BpBtdmxIQQ> |
