@@ -211,7 +211,7 @@ Everything below was verified against the source, not assumed:
 
 **Levels and flow**
 - **Three playable levels**: 1 → 2 → 3. Level 3 is the last one; finishing it shows `LEVEL COMPLETE` and `R` replays it
-- `levels/Level04.gd` / `Level04.tscn` contain complete, working code (an earlier, cruder version of level 3 where breaking the wall *is* the win condition), but **nothing routes to them** — you will not encounter this level in normal play
+- **There is no level 4**: `levels/Level04.gd` / `Level04.tscn` (an earlier, cruder version of level 3 where breaking the wall *is* the win condition) have been deleted. Nothing routed to them and they were kept around as dead code, but `Level04.gd.uid` held the same UID as `Level03.gd.uid` — on export every `.tscn` becomes a binary `.scn` that embeds its ext_resource's UID, and the loader prefers that UID over the stored path, so **exported builds** ran `Level04.gd` for level 3. This never reproduces in the editor: a text `.tscn`'s `[ext_resource]` carries no `uid=` field and loads purely by path. Never copy an existing `.uid` when adding a file
 - `Level03_PLACEHOLDER.tscn` and `Level05_PLACEHOLDER.tscn` only render a `LEVEL DESIGN TBD` label and are likewise unreachable
 - The filenames mislead: `Level02_PLACEHOLDER.tscn` is **not** a placeholder — it carries `levels/level_02.gd`, the real playable level 2
 
@@ -226,7 +226,6 @@ Everything below was verified against the source, not assumed:
 - **29 PNGs are referenced by no code at all**: `LevelBase.platform()` only ever loads `platform_02/03` and their crimson counterparts, so the other ten platform variants (20 files across both palettes), the portal art (7 files) and the two platform atlases all sit idle. A further 10 files — the slime's attack and jump frames — are referenced only by the never-spawned `Slime.tscn` and so never appear in play
 - `interactables/CollapsingPlatform.gd` and `ui/HUD.tscn` are dead paths: `Level01._collapse()` has no callers and `LevelBase.collapse_platforms` is always empty; the real HUD is built in code by `LevelBase._build_common()`, and nothing references `ui/HUD.tscn`
 - **The bundled font is a subset**: `assets/fonts/NotoSansTC-Subset.ttf` covers the Big5 common-character set (5748 glyphs). Chinese UI text added later that falls outside that range will render as empty boxes in the browser build with no error of any kind — rerun `py tools/make_font_subset.py` to regenerate the font
-- `levels/Level03.gd.uid` and `levels/Level04.gd.uid` hold the same UID, which produces one import warning on every `godot --headless --import`. It does not affect runtime
 
 **Not present**
 - No single-player mode, no audio or key-binding settings (the pause panel only offers resume / main menu / quit)
@@ -235,7 +234,7 @@ Everything below was verified against the source, not assumed:
 **Future work**
 1. Add background music, menu and enemy audio, and put the still-unused `dog_idle.wav` and `dog_sfx_preview.wav` to work
 2. Fix the `p2_left` / `p2_right` InputMap keycodes and remove the hardcoded fallback
-3. Route `Level04` into the level flow and build out level 5
+3. Build out levels 4 and 5
 4. Give the charging monster a `HurtBox` so attacking means something
 
 ## Third-Party Services, Data & Assets

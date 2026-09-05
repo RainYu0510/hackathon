@@ -211,7 +211,7 @@ python tools/serve.py
 
 **關卡與流程**
 - 目前**共三關可玩**：第一關 → 第二關 → 第三關，第三關為最後一關，通關後顯示 `LEVEL COMPLETE`，按 `R` 可重玩
-- `levels/Level04.gd` / `Level04.tscn` 有完整可執行的程式碼（第三關的早期粗胚版，破牆即過關），但**沒有任何路徑指向它**，正常遊玩不會遇到
+- **沒有第四關**：`levels/Level04.gd` / `Level04.tscn`（第三關的早期粗胚版，破牆即過關）已刪除。它們原本沒有任何路徑指向、被當成死程式碼留著，但 `Level04.gd.uid` 與 `Level03.gd.uid` 內容相同 —— 匯出時 `.tscn` 會轉成 binary `.scn` 並把 ext_resource 的 UID 一起寫入，而載入時 UID 優先於 path，於是**匯出版**的第三關實際執行的是 `Level04.gd`（編輯器裡不會發生：文字 `.tscn` 的 `[ext_resource]` 沒有 `uid=` 欄位，純靠 path 載入）。新增檔案時不要連既有的 `.uid` 一起複製
 - `Level03_PLACEHOLDER.tscn` 與 `Level05_PLACEHOLDER.tscn` 是只顯示 `LEVEL DESIGN TBD` 的空槽，同樣無路徑指向
 - 檔名有誤導性：`Level02_PLACEHOLDER.tscn` **不是**佔位關卡，它掛的是 `levels/level_02.gd`，是真正可玩的第二關
 
@@ -226,7 +226,6 @@ python tools/serve.py
 - **29 張 PNG 沒有被任何程式碼引用**：`LevelBase.platform()` 只載入 `platform_02/03` 與其 crimson 版本，所以其餘 10 種平台變體（兩個色系共 20 張）、傳送門美術（7 張）與兩張平台圖集都是閒置的。另有史萊姆的 attack／jump 共 10 張只被從未生成的 `Slime.tscn` 使用，實際遊戲中不會出現
 - `interactables/CollapsingPlatform.gd` 與 `ui/HUD.tscn` 是死路徑：`Level01._collapse()` 沒有呼叫者，`LevelBase.collapse_platforms` 永遠是空陣列；實際 HUD 由 `LevelBase._build_common()` 以程式建構，`ui/HUD.tscn` 沒有任何引用
 - **內嵌字型是子集**：`assets/fonts/NotoSansTC-Subset.ttf` 收錄 Big5 常用字（5748 個字形）。若日後新增的中文 UI 文字超出這個範圍，那些字在瀏覽器版會顯示成空框，且不會有任何錯誤訊息 —— 需重跑 `py tools/make_font_subset.py` 重新產生字型
-- `levels/Level03.gd.uid` 與 `levels/Level04.gd.uid` 內容相同（重複的 UID），每次 `godot --headless --import` 會出現一則匯入警告，不影響執行
 
 **尚未具備**
 - 無單人模式、無音量或按鍵設定（暫停面板只有繼續／回主選單／離開遊戲）
@@ -235,7 +234,7 @@ python tools/serve.py
 **未來工作**
 1. 補上背景音樂、選單與敵人音效，並讓仍未使用的 `dog_idle.wav`、`dog_sfx_preview.wav` 派上用場
 2. 修正 `p2_left` / `p2_right` 的 InputMap keycode，移除硬寫的後備路徑
-3. 把 `Level04` 接進關卡流程，並補完第五關
+3. 補完第四關與第五關
 4. 為衝刺怪加上 `HurtBox`，讓攻擊行為有意義
 
 ## 第三方服務、資料與素材
