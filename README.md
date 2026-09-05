@@ -6,6 +6,25 @@
 
 ---
 
+## 文件導覽
+
+| 文件 | 內容 |
+|---|---|
+| **[開發日誌 `development-log/`](development-log/)** | **6 篇、約 79 KB 的工程紀錄** —— 每一輪的設計決策、踩到的坑與實際解法 |
+| **[第三方揭露 `CREDITS.md`](CREDITS.md)** | 引擎、AI 模型、**NOXCAT 官方 IP**、字型、音效的逐項來源與授權 |
+| [LICENSE](LICENSE) | MIT，以及 NOXCAT 素材與內嵌字型的例外條款 |
+| [發布指南 `docs/release-guide.md`](docs/release-guide.md) | 打包流程、GitHub Release 與 itch.io 上傳步驟 |
+| [`AGENTS.md`](AGENTS.md) | 協作規約與兩條架構通則，程式碼實際遵循 |
+
+開發日誌中技術密度較高的幾篇：
+
+- [**偽 2D 平台遊戲原型**](development-log/2026-09-04-pseudo-2d-platformer-prototype.md) —— 整體架構、落後者優先鏡頭，以及 `SubViewport` 輸入路由的陷阱
+- [**雙空間疊合機制**](development-log/2026-09-04-stage1-dual-space.md) —— 可見性與碰撞形狀同步切換的實作
+- [**素材流程**](development-log/2026-09-04-sprite-pipeline-and-player-art.md) —— AI 生成接觸表 → 切幀 → 腳底基線對齊
+- [**匯出版第三關跑成第四關**](development-log/2026-09-05-level3-uid-collision.md) —— 從 binary `.scn` 的位元組追出重複 UID，附可查證的推導
+
+---
+
 ## 問題與目標
 
 多數雙人合作遊戲給兩名玩家一模一樣的能力，「合作」因此退化成「一起走同一條路」—— 少一個人只是慢一點，不是過不去。
@@ -114,7 +133,7 @@ flowchart TB
 | `data/` | 靜態關卡資料（目前只有 `level_02.json`） |
 | `tools/` | 音效合成腳本、中文字型子集產生腳本、本機靜態伺服器、匯出範本安裝腳本 |
 | `docs/` | [發布指南](docs/release-guide.md)（GitHub Release 與 itch.io 上傳步驟），以及 `plan-v5.md`（**前一個原型的計畫文件，非現行架構**） |
-| `development-log/` | 逐次開發決策紀錄，共 5 篇。最新一篇是 [主選單／過關統一／史萊姆重做](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
+| [`development-log/`](development-log/) | 逐次開發決策紀錄，共 **6 篇**。最新一篇是 [匯出版第三關跑成第四關 —— 重複 UID](development-log/2026-09-05-level3-uid-collision.md) |
 | `AGENTS.md` | 專案的協作規約與兩條架構通則（輸入一律輪詢 `Input` singleton；跨節點初始化一律父推子），程式碼實際遵循這兩條 |
 
 ## 使用技術

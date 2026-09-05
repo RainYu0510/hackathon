@@ -6,6 +6,25 @@
 
 ---
 
+## Documentation Map
+
+| Document | Contents |
+|---|---|
+| **[Development log `development-log/`](development-log/)** | **Six entries, roughly 79 KB of engineering notes** — the design decisions of each session, the traps hit, and how they were resolved |
+| **[Third-party disclosure `CREDITS.md`](CREDITS.md)** | Per-item origin and licensing for the engine, AI models, the **official NOXCAT IP**, the font and the audio |
+| [LICENSE](LICENSE) | MIT, plus the carve-outs for the NOXCAT assets and the bundled font |
+| [Release guide `docs/release-guide.md`](docs/release-guide.md) | Packaging, GitHub Release and itch.io upload steps |
+| [`AGENTS.md`](AGENTS.md) | Working agreements and two hard architecture rules the code actually follows |
+
+The denser entries in the development log:
+
+- [**Pseudo-2D platformer prototype**](development-log/2026-09-04-pseudo-2d-platformer-prototype.md) — overall architecture, the trailing-player camera, and the `SubViewport` input-routing trap
+- [**Dual-space mechanic**](development-log/2026-09-04-stage1-dual-space.md) — switching visibility and collision shapes in lockstep
+- [**Asset pipeline**](development-log/2026-09-04-sprite-pipeline-and-player-art.md) — AI contact sheets → frame slicing → foot-baseline alignment
+- [**Level 3 ran as level 4 in exported builds**](development-log/2026-09-05-level3-uid-collision.md) — tracking a duplicate UID down through the bytes of a binary `.scn`
+
+---
+
 ## Problem & Goals
 
 Most co-op games hand both players an identical moveset, so "cooperation" degrades into "walking the same path together" — losing a partner makes you slower, not stuck.
@@ -114,7 +133,7 @@ Directory responsibilities:
 | `data/` | Static level data (currently only `level_02.json`) |
 | `tools/` | Sound synthesis script, Chinese font subsetter, local static server, export template installer |
 | `docs/` | [Release guide](docs/release-guide.md) (GitHub Release and itch.io upload steps), plus `plan-v5.md` (**a plan for an earlier prototype — not the current architecture**) |
-| `development-log/` | Per-session design decision records, five entries. The latest covers [the menu, exit unification and slime rework](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
+| [`development-log/`](development-log/) | Per-session design decision records, **six entries**. The latest covers [level 3 running as level 4 in exported builds](development-log/2026-09-05-level3-uid-collision.md) |
 | `AGENTS.md` | Project working agreements plus two hard architecture rules (always poll the `Input` singleton; cross-node initialisation always flows parent-to-child), both of which the code actually follows |
 
 ## Tech Stack
