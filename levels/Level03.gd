@@ -44,11 +44,15 @@ func build_level() -> void:
 	wall = _make_wall(Vector2(2160,500), Vector2(120,200))  # 脆弱段 y[400,600],撞破後是通路
 	wall.connect("wall_broken", _on_wall_broken)
 
-	# ── 怪物:待在洞口(牆)前面,只追狗,狗靠近才會跟 ──────────
+	# ── 史萊姆:平常在凹槽右半來回巡邏,誰下凹槽就追誰 ──────────
 	var monster := preload("res://actors/enemies/ChargeMonster/ChargeMonster.tscn").instantiate()
 	monster.position = Vector2(1950,595)
-	monster.target_player_index = 1     # 只鎖定 P2 狗;不然貓在高平台上反而比較近會被衝
 	monster.chase_range = 520.0         # 狗靠近才跟,否則牠開場就自己走到左端,引誘步驟會消失
+	# 索敵改用高度帶(預設 80):高平台頂面 490、凹槽底頂面 600,差 110,
+	# 所以貓待在高平台上不會被鎖定,不必再硬鎖 target_player_index。
+	# 巡邏範圍:左界留在階梯(x[1000,1150])右邊,右界留在牆(x=2100 起)前面。
+	monster.patrol_min_x = 1400.0
+	monster.patrol_max_x = 2050.0
 	add_child(monster)
 
 	# ── 門:在牆後面,破牆之前到不了 ────────────────────────

@@ -1,7 +1,12 @@
 class_name LevelBase
 extends Node2D
 
+## 主選單場景。關卡裡按 Esc 叫出暫停面板,從那裡的「回主選單」回到這裡。
+## PauseMenu 也讀這個常數,路徑只有這一份。
+const MAIN_MENU_PATH := "res://ui/MainMenu.tscn"
+
 var hud: Label
+var pause_menu: CanvasLayer
 var collapse_platforms: Array[Node] = []
 
 func _ready() -> void:
@@ -16,10 +21,14 @@ func build_level() -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("reset_room"): get_tree().reload_current_scene()
+	# 暫停中這個 _process 不會跑(節點是預設的 inherit),所以 Esc 只會「開啟」;
+	# 收起面板由 PauseMenu 自己輪詢,兩邊不會互搶。
+	if pause_menu and Input.is_action_just_pressed("ui_cancel"): pause_menu.open()
 	if Input.is_action_just_pressed("debug_normal"): DimensionManager.set_dimension(DimensionManager.Dimension.NORMAL)
 	if Input.is_action_just_pressed("debug_alternate"): DimensionManager.set_dimension(DimensionManager.Dimension.ALTERNATE)
-	if Input.is_action_just_pressed("debug_info"): hud.visible = not hud.visible
-	if hud:
+	if hud and Input.is_action_just_pressed("debug_info"): hud.visible = not hud.visible
+	# 除錯 HUD 藏起來時就不必每幀走一次 player group、也不必解參照 health。
+	if hud and hud.visible:
 		var players := get_tree().get_nodes_in_group("player")
 		var owner := "None"
 		var hp := []
@@ -30,11 +39,17 @@ func _process(_delta: float) -> void:
 
 func _build_common() -> void:
 	var canvas := CanvasLayer.new(); canvas.name = "HUD"; add_child(canvas)
-	hud = Label.new(); hud.position = Vector2(18,18); hud.add_theme_font_size_override("font_size", 18); hud.modulate = Color("dffcff"); canvas.add_child(hud)
-	var controls := Label.new(); controls.position = Vector2(18,620); controls.text = "P1: A/D/W · F Attack · G Interact/Dimension     P2: Arrows · K Attack · L Interact"; controls.add_theme_font_size_override("font_size",16); canvas.add_child(controls)
+	# 除錯 HUD 預設隱藏 —— 空間/護目鏡/鑰匙/雙方 HP 是開發用數值,不是給玩家看的。
+	# F1 仍然可以叫出來。
+	hud = Label.new(); hud.position = Vector2(18,18); hud.add_theme_font_size_override("font_size", 18); hud.modulate = Color("dffcff"); hud.visible = false; canvas.add_child(hud)
+	# 操作提示列 —— 這是給玩家看的,永遠顯示。R / Esc 也寫在這裡:原本只寫在除錯 HUD
+	# 的文字裡,HUD 一藏就跟著不見。F1/F2/F3 是開發鍵,留在除錯 HUD 裡就好。
+	var controls := Label.new(); controls.position = Vector2(18,620); controls.text = "P1: A/D/W · F Attack · G Interact/Dimension     P2: Arrows · K Attack · L Interact     R Restart · Esc Pause"; controls.add_theme_font_size_override("font_size",16); canvas.add_child(controls)
 	var camera := Camera2D.new(); camera.name = "SharedCamera2D"; camera.position = Vector2(520,400); camera.position_smoothing_enabled = true; camera.position_smoothing_speed = 5; camera.set_script(load("res://systems/SharedCamera.gd")); add_child(camera)
 	var death := Area2D.new(); death.name = "DeathZone"; death.collision_layer = 0; death.collision_mask = 2; death.set_script(load("res://interactables/DeathZone.gd")); add_child(death)
 	var shape := CollisionShape2D.new(); var rect := RectangleShape2D.new(); rect.size = Vector2(5000,200); shape.shape = rect; shape.position = Vector2(2000,900); death.add_child(shape)
+	# 暫停面板:繼續 / 回主選單 / 離開遊戲。父推子,由關卡掛上去。
+	pause_menu = preload("res://ui/PauseMenu.tscn").instantiate(); add_child(pause_menu)
 
 func spawn_players(p1: Vector2, p2: Vector2) -> void:
 	var cat := preload("res://actors/players/NoxCat/NoxCat.tscn").instantiate(); cat.position = p1; add_child(cat)
@@ -91,6 +106,7 @@ func pickup(pos: Vector2, key_pickup := false) -> void:
 func _on_key_collected() -> void:
 	for item in collapse_platforms:
 		item.call("trigger")
+	_update_exit_hint()
 
 func _on_level_complete() -> void:
 	var message := Label.new(); message.text="LEVEL COMPLETE"; message.position=Vector2(465,250); message.add_theme_font_size_override("font_size",46); $HUD.add_child(message)
@@ -101,6 +117,7 @@ func _on_level_complete() -> void:
 var next_scene_path := ""
 var _transitioning := false   # one-shot,擋掉兩名玩家各觸發一次換場
 var _exit_armed := false
+var _exit_requires_key := false
 var _exit_occupants: Array[Node] = []
 var _exit_hint: Label
 
@@ -115,7 +132,9 @@ func go_to_next_level() -> void:
 
 ## 建立出口觸發器。require_key 為 true 時必須先拿到鑰匙。
 ## 過關條件是「兩名玩家都在門框內」—— 單人衝到終點不能把隊友丟下自己過關。
+## 三關共用這一套,不要再在各關自己寫一份門邏輯。
 func exit_trigger(pos: Vector2, size: Vector2, require_key := false) -> Area2D:
+	_exit_requires_key = require_key
 	var area := Area2D.new(); area.position = pos; area.collision_layer = 0; area.collision_mask = 2
 	var cs := CollisionShape2D.new(); var rect := RectangleShape2D.new(); rect.size = size; cs.shape = rect; area.add_child(cs)
 	area.body_exited.connect(_on_exit_body_exited)
@@ -169,10 +188,19 @@ func _try_exit(require_key: bool) -> void:
 			return
 	go_to_next_level()
 
-## 有人站在出口、但人還沒到齊時給提示。沒有這個的話,一名玩家站在門口沒反應
-## 會被當成「換場壞掉」回報。
+## 有人站在出口、但條件還沒滿足時給提示。沒有這個的話,玩家站在門口沒反應
+## 會被當成「換場壞掉」回報。缺鑰匙與缺人是兩種不同的卡住,分開講清楚。
 func _update_exit_hint() -> void:
 	if not is_instance_valid(_exit_hint):
 		return
-	var total := get_tree().get_nodes_in_group("player").size()
-	_exit_hint.visible = _exit_occupants.size() > 0 and _exit_occupants.size() < total
+	# 還沒武裝 = 玩家是「生在門框裡」而不是走進來的(第一關就是),
+	# 這時候跳提示會變成一開場就有一行字掛在畫面上,看起來像壞掉。
+	if not _exit_armed or _exit_occupants.is_empty():
+		_exit_hint.visible = false
+		return
+	if _exit_requires_key and not GameManager.has_key:
+		_exit_hint.text = "Find the key first"
+		_exit_hint.visible = true
+		return
+	_exit_hint.text = "Both players must be at the door"
+	_exit_hint.visible = _exit_occupants.size() < get_tree().get_nodes_in_group("player").size()
