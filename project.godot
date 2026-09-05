@@ -27,6 +27,13 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 
+[gui]
+
+; 內嵌中文字型。Godot 內建預設字型不含中日韓字符,桌面版靠系統字型 fallback
+; 所以看不出問題,但 Web 匯出沒有系統字型可用,中文會全部變成豆腐方塊。
+; 這個字型是 Noto Sans TC 的子集,由 tools/make_font_subset.py 產生。
+theme/custom_font="res://assets/fonts/NotoSansTC-Subset.ttf"
+
 [input]
 
 p1_left={

@@ -24,6 +24,7 @@ This project attacks that directly: **make the two players' abilities deliberate
 - **Level 2 — data-driven vertical tower** — geometry is defined entirely by [`data/level_02.json`](data/level_02.json); the left-hand steps exist only in normal space and the right-hand ones only in alternate space, so you flip as you climb
 - **Level 3 — lure the charging monster** — flipping to alternate space enrages the slime; bait it toward the cracked wall and let it smash a passage. The slime patrols the pit when idle and only detects players standing on its own level (the cat is safe up on the high platform); it plays a death animation and disappears after breaking the wall, and if it misses it is stunned briefly and returns to patrol so you can bait it again
 - **The exit takes both players** — all three levels use the same `LevelBase.exit_trigger()`: both players must stand in the doorway to advance, and whoever arrives first sees a hint
+- **Player action sounds** — run loop, jump, attack, hit, death and device activation each have a sound effect, driven by the procedurally synthesised wav files
 - **Death restarts the level** — no lives; if either player dies or falls, the whole level reloads after one second
 - **Main menu and level select** — start game / **level select (jump straight to level 1, 2 or 3)** / controls / quit; press `Esc` in game to pause, then resume, return to the menu or quit
 - **Debug HUD** — **hidden by default**, press F1 to bring it up; shows the current space, goggle owner, key state and both players' HP. The play screen only keeps the control hints
@@ -109,9 +110,9 @@ Directory responsibilities:
 | `components/` | Composable components: `HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | Key, goggles, breakable wall, death zone and friends |
 | `systems/` | Space switching and the shared camera |
-| `assets/` | Art (152 PNGs) and audio (8 wav + 3 mp3) |
+| `assets/` | Art (153 PNGs), audio (8 wav + 3 mp3), and `fonts/` holding the Chinese subset font plus its OFL licence text |
 | `data/` | Static level data (currently only `level_02.json`) |
-| `tools/` | Sound synthesis script, local static server, export template installer |
+| `tools/` | Sound synthesis script, Chinese font subsetter, local static server, export template installer |
 | `docs/` | [Release guide](docs/release-guide.md) (GitHub Release and itch.io upload steps), plus `plan-v5.md` (**a plan for an earlier prototype — not the current architecture**) |
 | `development-log/` | Per-session design decision records, five entries. The latest covers [the menu, exit unification and slime rework](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
 | `AGENTS.md` | Project working agreements plus two hard architecture rules (always poll the `Input` singleton; cross-node initialisation always flows parent-to-child), both of which the code actually follows |
@@ -215,7 +216,7 @@ Everything below was verified against the source, not assumed:
 - The filenames mislead: `Level02_PLACEHOLDER.tscn` is **not** a placeholder — it carries `levels/level_02.gd`, the real playable level 2
 
 **Inconsistencies and unwired content**
-- **The game plays no audio at all.** None of the 11 files in `assets/audio/` is referenced by any `.gd` or `.tscn`; play is silent
+- **Audio covers player actions only**: `actors/players/PlayerBase.gd` plays run / jump / attack / hit / death / device sounds. There is **no background music, no menu audio and no enemy audio**. Both characters share the same `dog_*` clips, and `dog_idle.wav`, `dog_sfx_preview.wav` and the three MP3s remain unreferenced by any code
 - **Player attacks have no target in the playable levels**: the level 3 enemy (class `ChargeMonster`, drawn with the slime art) has no `HurtBox` and cannot be killed, and `Slime.tscn` — the only entity carrying an enemy `HurtBox` — is never spawned by any level. So `F` / `K` hit nothing across all three levels
 - **The level 3 enemy is a one-hit kill**: its `HitBox` has `damage = 99` against a player `HealthComponent` with `max_health = 5`, so being caught by a charge kills instantly and reloads the level
 - **Checkpoints are purely decorative**: the door-shaped objects do not act as respawn points. Death always reloads the level, and `GameManager.respawn_all()` has no callers
@@ -224,6 +225,7 @@ Everything below was verified against the source, not assumed:
 - **The tether gives no visual feedback**: at 820 px apart, outward movement input is silently zeroed with nothing on screen to explain it
 - **Roughly 32 PNGs are unused**: `LevelBase.platform()` only ever loads `platform_02/03` and their crimson counterparts, leaving `platform_01` and `platform_04`–`platform_12` (both palettes) unreferenced, along with the portal art (7 files), two platform atlases and the slime's jump animation (5 files)
 - `interactables/CollapsingPlatform.gd` and `ui/HUD.tscn` are dead paths: `Level01._collapse()` has no callers and `LevelBase.collapse_platforms` is always empty; the real HUD is built in code by `LevelBase._build_common()`, and nothing references `ui/HUD.tscn`
+- **The bundled font is a subset**: `assets/fonts/NotoSansTC-Subset.ttf` covers the Big5 common-character set (5748 glyphs). Chinese UI text added later that falls outside that range will render as empty boxes in the browser build with no error of any kind — rerun `py tools/make_font_subset.py` to regenerate the font
 - `levels/Level03.gd.uid` and `levels/Level04.gd.uid` hold the same UID, which produces one import warning on every `godot --headless --import`. It does not affect runtime
 
 **Not present**
@@ -231,7 +233,7 @@ Everything below was verified against the source, not assumed:
 - No save system — closing the game returns you to level 1
 
 **Future work**
-1. Wire up audio playback so the existing 11 files actually do something
+1. Add background music, menu and enemy audio, and put the still-unused `dog_idle.wav` and `dog_sfx_preview.wav` to work
 2. Fix the `p2_left` / `p2_right` InputMap keycodes and remove the hardcoded fallback
 3. Route `Level04` into the level flow and build out level 5
 4. Give the charging monster a `HurtBox` so attacking means something
@@ -244,10 +246,10 @@ Full itemised list in **[CREDITS.md](CREDITS.md)**. Summary:
 |---|---|---|---|
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | Game engine; the web build includes engine-generated JS/WASM runtime code, also MIT |
 | Game source code | Written by the team | MIT (see [LICENSE](LICENSE)) | No third-party addons or plugins |
-| Art assets (152 PNGs) | Generated with OpenAI ChatGPT Images 2.0 (`gpt-image-2`), then sliced by our own pipeline | Output owned by the user under OpenAI's terms of use | Generated 2026-09-04 to 09-05; process notes in the [development log](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
-| Sound effects `dog_*.wav` (8) | Synthesised by [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) | MIT (with this project) | Fully original — no sampled material |
+| Art assets (153 PNGs) | Generated with OpenAI ChatGPT Images 2.0 (`gpt-image-2`), then sliced by our own pipeline | Output owned by the user under OpenAI's terms of use | Generated 2026-09-04 to 09-05; process notes in the [development log](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
+| Sound effects `dog_*.wav` (8, six of them in use) | Synthesised by [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) | MIT (with this project) | Fully original — no sampled material |
 | `jump.mp3` / `slime dead.mp3` / `slime walk.mp3` | **Origin unconfirmed** | **Unconfirmed** | Unreferenced by any code and excluded via `export_presets.cfg`; **not included in any released build** |
-| Fonts | None bundled | — | Godot's built-in default font throughout |
+| Font `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc) (Google Fonts) | **SIL Open Font License 1.1** (text in [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)) | **The project's only third-party asset.** Subset down to 1.9 MB by [`tools/make_font_subset.py`](tools/make_font_subset.py). It has to be bundled because Godot's default font carries no CJK glyphs and the web build has no system font to fall back on — Chinese text would render as tofu boxes |
 | Level data `data/level_02.json` | Made by the team | MIT (with this project) | No external datasets |
 
 This repository contains no API keys, tokens, passwords or credential files.

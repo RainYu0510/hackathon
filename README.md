@@ -24,6 +24,7 @@
 - **第二關：資料驅動的垂直塔** —— 幾何完全由 [`data/level_02.json`](data/level_02.json) 定義，左側階梯只存在於常態空間、右側只存在於異空間，必須邊爬邊切換
 - **第三關：誘導衝刺怪破牆** —— 切到異空間會激怒史萊姆，把牠引向裂開的牆，讓牠撞出通道。史萊姆平常在凹槽裡來回巡邏，只會偵測到「跟牠同一層」的玩家（站在高平台上的貓是安全的）；撞破牆後會播死亡動畫消失，撞歪則暈眩一下回到巡邏，可以再誘一次
 - **過關要兩人到齊** —— 三關的出口都用同一套 `LevelBase.exit_trigger()`：兩名玩家都站進門框才過關，一人先到會顯示提示
+- **玩家動作音效** —— 跑步循環、跳躍、攻擊、受擊、死亡與裝置啟動各有音效，由程式化合成的 wav 驅動
 - **死亡整關重來** —— 沒有生命數，任一人死亡或墜落，1 秒後整關重載
 - **主選單與選關** —— 開始遊戲／**選擇關卡（第一／二／三關可直接進入）**／操作說明／離開；遊玩中按 `Esc` 暫停，可繼續、回主選單或離開遊戲
 - **除錯 HUD** —— **預設隱藏**，F1 才叫得出來，顯示目前空間、護目鏡持有者、鑰匙狀態與雙方血量。玩家畫面上只留操作提示列
@@ -109,9 +110,9 @@ flowchart TB
 | `components/` | 可組合元件：`HitBox` / `HurtBox` / `HealthComponent` |
 | `interactables/` | 鑰匙、護目鏡、可破壞牆、死亡區等互動物件 |
 | `systems/` | 空間世界切換與共用鏡頭 |
-| `assets/` | 美術（152 張 PNG）與音訊（8 wav + 3 mp3）素材 |
+| `assets/` | 美術（153 張 PNG）、音訊（8 wav + 3 mp3），以及 `fonts/` 內的中文子集字型與其 OFL 授權條文 |
 | `data/` | 靜態關卡資料（目前只有 `level_02.json`） |
-| `tools/` | 音效合成腳本、本機靜態伺服器、匯出範本安裝腳本 |
+| `tools/` | 音效合成腳本、中文字型子集產生腳本、本機靜態伺服器、匯出範本安裝腳本 |
 | `docs/` | [發布指南](docs/release-guide.md)（GitHub Release 與 itch.io 上傳步驟），以及 `plan-v5.md`（**前一個原型的計畫文件，非現行架構**） |
 | `development-log/` | 逐次開發決策紀錄，共 5 篇。最新一篇是 [主選單／過關統一／史萊姆重做](development-log/2026-09-05-menu-exit-unify-slime-rework.md) |
 | `AGENTS.md` | 專案的協作規約與兩條架構通則（輸入一律輪詢 `Input` singleton；跨節點初始化一律父推子），程式碼實際遵循這兩條 |
@@ -215,7 +216,7 @@ python tools/serve.py
 - 檔名有誤導性：`Level02_PLACEHOLDER.tscn` **不是**佔位關卡，它掛的是 `levels/level_02.gd`，是真正可玩的第二關
 
 **機制的不一致與未接上的部分**
-- **遊戲不播放任何音效**。`assets/audio/` 內 11 個音檔全數沒有被任何 `.gd` 或 `.tscn` 引用，遊戲中是無聲的
+- **音效只覆蓋玩家動作**：`actors/players/PlayerBase.gd` 播放跑／跳／攻擊／受擊／死亡／裝置六種音效，**沒有背景音樂、沒有選單音效、沒有敵人音效**。兩個角色共用同一組 `dog_*` 音檔。`assets/audio/` 內尚有 `dog_idle.wav`、`dog_sfx_preview.wav` 與 3 個 mp3 未被任何程式碼引用
 - **玩家攻擊在可玩關卡中沒有目標**：第三關的敵人（class 名為 `ChargeMonster`，借用史萊姆美術）沒有 `HurtBox`，無法被擊殺；唯一具備敵方 `HurtBox` 的 `Slime.tscn` 從未被任何關卡生成。因此 `F` / `K` 攻擊鍵在這三關裡打不到任何東西
 - **第三關的敵人是一擊死亡**：其 `HitBox` 的 `damage = 99`，而玩家 `HealthComponent` 的 `max_health = 5`，被衝刺撞到即死並觸發整關重載
 - **檢查點是純裝飾**：畫面上的門形物件不具復活功能。死亡一律整關重載，`GameManager.respawn_all()` 沒有任何呼叫者
@@ -224,6 +225,7 @@ python tools/serve.py
 - **牽繩沒有任何視覺回饋**：兩人相距達 820 px 時往外的移動輸入會被直接歸零，畫面上不會有提示
 - **約 32 張 PNG 未被使用**：`LevelBase.platform()` 只載入 `platform_02/03` 與其 crimson 版本，因此 `platform_01`、`platform_04`～`platform_12` 及對應的 crimson 版本皆未使用；此外傳送門美術（7 張）、兩張平台圖集、史萊姆的 jump 動畫（5 張）也未被引用
 - `interactables/CollapsingPlatform.gd` 與 `ui/HUD.tscn` 是死路徑：`Level01._collapse()` 沒有呼叫者，`LevelBase.collapse_platforms` 永遠是空陣列；實際 HUD 由 `LevelBase._build_common()` 以程式建構，`ui/HUD.tscn` 沒有任何引用
+- **內嵌字型是子集**：`assets/fonts/NotoSansTC-Subset.ttf` 收錄 Big5 常用字（5748 個字形）。若日後新增的中文 UI 文字超出這個範圍，那些字在瀏覽器版會顯示成空框，且不會有任何錯誤訊息 —— 需重跑 `py tools/make_font_subset.py` 重新產生字型
 - `levels/Level03.gd.uid` 與 `levels/Level04.gd.uid` 內容相同（重複的 UID），每次 `godot --headless --import` 會出現一則匯入警告，不影響執行
 
 **尚未具備**
@@ -231,7 +233,7 @@ python tools/serve.py
 - 無存檔，關閉後從第一關重新開始
 
 **未來工作**
-1. 接上音效播放，讓既有的 11 個音檔實際發揮作用
+1. 補上背景音樂、選單與敵人音效，並讓仍未使用的 `dog_idle.wav`、`dog_sfx_preview.wav` 派上用場
 2. 修正 `p2_left` / `p2_right` 的 InputMap keycode，移除硬寫的後備路徑
 3. 把 `Level04` 接進關卡流程，並補完第五關
 4. 為衝刺怪加上 `HurtBox`，讓攻擊行為有意義
@@ -244,10 +246,10 @@ python tools/serve.py
 |---|---|---|---|
 | Godot Engine 4.7.2 stable | https://godotengine.org | MIT License | 遊戲引擎；Web 版包含引擎產生的 JS/WASM 執行期程式碼，同為 MIT |
 | 遊戲程式碼 | 團隊自行撰寫 | MIT（見 [LICENSE](LICENSE)） | 無任何第三方外掛或 addon |
-| 美術素材（152 張 PNG） | 以 OpenAI ChatGPT Images 2.0（`gpt-image-2`）生成後由團隊自寫流程切幀 | 依 OpenAI 使用條款，產出歸使用者所有 | 生成於 2026-09-04～05；流程紀錄見 [開發日誌](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
-| 音效 `dog_*.wav`（8 個） | 由 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 程式化合成 | MIT（隨本專案） | 完全原創，非取樣素材 |
+| 美術素材（153 張 PNG） | 以 OpenAI ChatGPT Images 2.0（`gpt-image-2`）生成後由團隊自寫流程切幀 | 依 OpenAI 使用條款，產出歸使用者所有 | 生成於 2026-09-04～05；流程紀錄見 [開發日誌](development-log/2026-09-04-sprite-pipeline-and-player-art.md) |
+| 音效 `dog_*.wav`（8 個，其中 6 個實際使用） | 由 [`tools/generate_dog_sfx.js`](tools/generate_dog_sfx.js) 程式化合成 | MIT（隨本專案） | 完全原創，非取樣素材 |
 | `jump.mp3` / `slime dead.mp3` / `slime walk.mp3` | **來源待確認** | **未確認** | 未被程式碼引用，且已在 `export_presets.cfg` 中排除，**不包含在任何發布版本內** |
-| 字型 | 無自帶字型 | — | 全部使用 Godot 內建預設字型 |
+| 字型 `NotoSansTC-Subset.ttf` | [Noto Sans TC](https://github.com/google/fonts/tree/main/ofl/notosanstc)（Google Fonts） | **SIL Open Font License 1.1**（條文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt)） | **本專案唯一的第三方素材。** 由 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成 1.9 MB 的子集。內嵌的原因是 Godot 預設字型不含中文，Web 版沒有系統字型可 fallback，中文會變豆腐方塊 |
 | 關卡資料 `data/level_02.json` | 團隊自製 | MIT（隨本專案） | 無外部資料集 |
 
 本儲存庫不包含任何 API 金鑰、Token、密碼或憑證檔案。

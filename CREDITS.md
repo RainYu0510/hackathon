@@ -3,7 +3,7 @@
 本文件逐項列出 **NoxCat: Riftbound Co-op** 使用到的所有外部資源、其來源與授權狀態。
 
 隊伍：水返腳(2).png（T054）
-最後更新：2026-09-05（對應 commit `1298e0c`）
+最後更新：2026-09-05（對應 commit `b487b1e`）
 
 開發過程的逐次決策紀錄見 [`development-log/`](development-log/)（共 5 篇），其中素材製作流程見 [sprite pipeline 那篇](development-log/2026-09-04-sprite-pipeline-and-player-art.md)，最新的選單與敵人重做見 [這篇](development-log/2026-09-05-menu-exit-unify-slime-rework.md)。
 
@@ -39,8 +39,8 @@
 | 角色動畫（NoxCat、CyberDog） | — | AI 影像生成 + 團隊自寫切幀流程 | 見下方說明 |
 | 敵人動畫（史萊姆，衝刺怪借用並上色） | — | 同上 | 同上 |
 | 空間背景、平台、傳送門 | — | 同上 | 同上 |
-| 互動物件圖示（護目鏡、鑰匙、門、牆面） | — | 同上 | 同上 |
-| **合計** | **152 張 PNG** | | |
+| 互動物件圖示（護目鏡、鑰匙、門、完整牆面與裂開牆面） | — | 同上 | 同上 |
+| **合計** | **153 張 PNG** | | |
 
 **生成方式與工具**
 
@@ -80,6 +80,8 @@
 
 這些檔案由一支 Node.js 腳本逐位元組寫出：手寫 RIFF/WAVE 標頭、以線性同餘產生器製造雜訊、搭配正弦包絡塑形，輸出 16-bit 單聲道 44.1 kHz PCM。**完全原創，未使用任何取樣素材或音效庫。** 執行 `node tools/generate_dog_sfx.js` 即可重新產生。
 
+其中 6 個（`dog_run`、`dog_jump`、`dog_attack`、`dog_hit`、`dog_death`、`dog_device`）已由 `actors/players/PlayerBase.gd` 實際播放；`dog_idle.wav` 與 `dog_sfx_preview.wav` 目前未被引用。
+
 ### 4.2 來源待確認的音效（3 個 MP3）
 
 | 檔案 | 來源 | 授權 | 處置 |
@@ -93,20 +95,35 @@
 採取的處置：
 
 1. **不隱瞞** —— 在此誠實揭露其狀態為未確認
-2. **不使用** —— 專案程式碼中沒有任何一處引用這三個檔案（遊戲目前不播放任何音效）
+2. **不使用** —— 專案程式碼中沒有任何一處引用這三個檔案。遊戲實際播放的音效全部來自程式化合成的 `dog_*.wav`
 3. **不散布** —— `export_presets.cfg` 的 `exclude_filter` 設為 `*.mp3`，因此它們**不會被打包進任何匯出的執行檔或 Web 版本**
 
 來源與授權確認之前，這三個檔案僅存在於原始碼樹中，不進入任何發布產物。
 
 ## 5. 字型與 UI 主題
 
-專案**未包含任何字型檔**（無 `.ttf`／`.otf`／`.woff`）。所有畫面文字使用 Godot 引擎內建的預設字型。
-
 | 項目 | 來源 | 授權 | 備註 |
 |---|---|---|---|
-| `ui/menu_theme.tres` | 團隊自行製作 | MIT（隨本專案） | 主選單與暫停選單共用的 Godot `Theme` 資源。純設定資料（顏色、字級、邊框），不含任何外部素材或字型檔 |
+| `assets/fonts/NotoSansTC-Subset.ttf` | **Noto Sans TC**（Google Fonts）<br><https://github.com/google/fonts/tree/main/ofl/notosanstc> | **SIL Open Font License 1.1**<br>條文全文見 [`assets/fonts/NotoSansTC-OFL.txt`](assets/fonts/NotoSansTC-OFL.txt) | **這是本專案唯一的第三方素材。** 原字型 11.9 MB，經 [`tools/make_font_subset.py`](tools/make_font_subset.py) 切成子集後為 1.9 MB（保留 5748 個字形：Big5 常用字、ASCII、Latin-1 與常用標點），並將可變字重固定為 Regular。詳見下方說明 |
+| `ui/menu_theme.tres` | 團隊自行製作 | MIT（隨本專案） | 主選單與暫停選單共用的 Godot `Theme` 資源。純設定資料（顏色、字級、邊框） |
 
-這是專案中唯一的 `.tres` 資源檔。
+### 為什麼需要內嵌字型
+
+Godot 內建的預設字型不含中日韓字符。桌面版看起來正常，是因為 Godot 會向作業系統的字型求援；但 **Web 匯出沒有系統字型可用**，所有中文都會顯示成豆腐方塊。因此必須把中文字型內嵌進專案，設定於 `project.godot` 的 `gui/theme/custom_font`。
+
+### SIL OFL 1.1 的遵循方式
+
+OFL 允許修改與再散布（切子集屬於修改），但要求：
+
+1. **散布時必須附上授權條文** —— `assets/fonts/NotoSansTC-OFL.txt` 保留在儲存庫中，並隨兩個發布用的 zip 一併散布
+2. **保留 Reserved Font Name** —— 子集化過程以 `name_IDs = ["*"]` 保留原字型的名稱與授權欄位，未改動字型名稱
+3. **子集字型本身仍受 OFL 1.1 約束**，不隨本專案的 MIT 授權
+
+注意：Noto Sans TC 衍生自 Adobe 的 Source Han Sans，其 OFL 條文中的版權聲明為 `Copyright 2014-2021 Adobe`，保留字型名稱為 `Source`。
+
+**未使用任何專有字型。** 特別說明：專案未內嵌 Windows 系統字型（如微軟正黑體），那類字型不允許再散布。
+
+`ui/menu_theme.tres` 是專案中唯一的 `.tres` 資源檔。
 
 ## 6. 資料
 
