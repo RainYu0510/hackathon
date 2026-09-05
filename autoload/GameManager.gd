@@ -29,6 +29,12 @@ func restart_level() -> void:
 	get_tree().create_timer(1.0).timeout.connect(_finish_level_restart, CONNECT_ONE_SHOT)
 
 func _finish_level_restart() -> void:
+	# SceneTreeTimer 掛在 SceneTree 上,換場不會取消它,receiver 又是 autoload ——
+	# 所以死後一秒內若換過場(按了跳關鍵、或走進了門),這個計時器還是會醒來、
+	# 把剛載入的新關卡莫名重載一次。reset_level_state() 會把旗標清成 false,
+	# 而它在每個 LevelBase._ready() 與跳關時都會被呼叫,以此讓過期的計時器失效。
+	if not restarting_level:
+		return
 	get_tree().reload_current_scene()
 
 func collect_key() -> void:

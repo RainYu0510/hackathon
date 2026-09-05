@@ -1,11 +1,26 @@
 class_name LevelBase
 extends Node2D
 
+## 隱藏的除錯捷徑:數字鍵 1~3 直接跳到對應關卡。
+## 刻意不寫進畫面上的操作說明 —— 這是給開發與測試用的,不是給玩家的。
+const DEBUG_LEVEL_SCENES: Array[String] = [
+	"res://levels/Level01.tscn",
+	"res://levels/Level02.tscn",
+	"res://levels/Level03.tscn",
+]
+
 var hud: Label
 var collapse_platforms: Array[Node] = []
+var _debug_level_key_down: Array[bool] = []
 
 func _ready() -> void:
 	GameManager.reset_level_state()
+	# 用「當下的按鍵狀態」初始化,不是全 false —— 跳關後手指若還按著,
+	# 全 false 會把「還按著」誤判成「又按了一次」,新關卡立刻再跳一次,
+	# 變成按住不放就無限重載。
+	_debug_level_key_down.resize(DEBUG_LEVEL_SCENES.size())
+	for i in DEBUG_LEVEL_SCENES.size():
+		_debug_level_key_down[i] = Input.is_physical_key_pressed(KEY_1 + i)
 	_build_common()
 	build_level()
 	GameManager.key_collected.connect(_on_key_collected)
@@ -19,6 +34,7 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("debug_normal"): DimensionManager.set_dimension(DimensionManager.Dimension.NORMAL)
 	if Input.is_action_just_pressed("debug_alternate"): DimensionManager.set_dimension(DimensionManager.Dimension.ALTERNATE)
 	if Input.is_action_just_pressed("debug_info"): hud.visible = not hud.visible
+	_poll_debug_level_jump()
 	if hud:
 		var players := get_tree().get_nodes_in_group("player")
 		var owner := "None"
@@ -27,6 +43,18 @@ func _process(_delta: float) -> void:
 			if p.has_goggle: owner = "Player %d" % (p.player_index + 1)
 			hp.append("P%d HP: %d" % [p.player_index + 1, p.health.health])
 		hud.text = "Dimension: %s\nGoggle Owner: %s\nKey: %s\n%s\nF1 HUD  F2 Normal  F3 Alternate  R Reset" % [DimensionManager.label(), owner, "Yes" if GameManager.has_key else "No", "   ".join(hp)]
+
+## 隱藏跳關:數字鍵 1~3。用 Input singleton 輪詢原始按鍵、自己記上一幀狀態,
+## 這樣不必在 project.godot 新增 InputMap action(那個檔案有過三次非預期寫入的
+## 紀錄),而且之後多一關只要在 DEBUG_LEVEL_SCENES 加一行。
+## 同樣的寫法 PlayerBase 的 fallback_jump_was_down 已經在用。
+func _poll_debug_level_jump() -> void:
+	for i in DEBUG_LEVEL_SCENES.size():
+		var down := Input.is_physical_key_pressed(KEY_1 + i)
+		if down and not _debug_level_key_down[i]:
+			GameManager.reset_level_state()
+			get_tree().call_deferred("change_scene_to_file", DEBUG_LEVEL_SCENES[i])
+		_debug_level_key_down[i] = down
 
 func _build_common() -> void:
 	var canvas := CanvasLayer.new(); canvas.name = "HUD"; add_child(canvas)
@@ -101,6 +129,8 @@ func _on_level_complete() -> void:
 var next_scene_path := ""
 var _transitioning := false   # one-shot,擋掉兩名玩家各觸發一次換場
 var _exit_armed := false
+var _exit_occupants: Array[Node] = []
+var _exit_hint: Label
 
 func go_to_next_level() -> void:
 	if _transitioning:
@@ -112,12 +142,14 @@ func go_to_next_level() -> void:
 	get_tree().call_deferred("change_scene_to_file", next_scene_path)
 
 ## 建立出口觸發器。require_key 為 true 時必須先拿到鑰匙。
+## 過關條件是「兩名玩家都在門框內」—— 單人衝到終點不能把隊友丟下自己過關。
 func exit_trigger(pos: Vector2, size: Vector2, require_key := false) -> Area2D:
 	var area := Area2D.new(); area.position = pos; area.collision_layer = 0; area.collision_mask = 2
 	var cs := CollisionShape2D.new(); var rect := RectangleShape2D.new(); rect.size = size; cs.shape = rect; area.add_child(cs)
 	area.body_exited.connect(_on_exit_body_exited)
 	area.body_entered.connect(_on_exit_body_entered.bind(require_key))
 	add_child(area)
+	_exit_hint = Label.new(); _exit_hint.text = "Both players must be at the door"; _exit_hint.position = Vector2(400,560); _exit_hint.add_theme_font_size_override("font_size",20); _exit_hint.visible = false; $HUD.add_child(_exit_hint)
 	_arm_exit_when_clear(area)
 	return area
 
@@ -136,12 +168,39 @@ func _arm_exit_when_clear(area: Area2D) -> void:
 	_exit_armed = true
 
 func _on_exit_body_exited(body: Node) -> void:
-	if body.is_in_group("player"):
-		_exit_armed = true
+	if not body.is_in_group("player"):
+		return
+	_exit_occupants.erase(body)
+	_exit_armed = true
+	_update_exit_hint()
 
 func _on_exit_body_entered(body: Node, require_key: bool) -> void:
-	if not _exit_armed or not body.is_in_group("player"):
+	if not body.is_in_group("player"):
+		return
+	if not _exit_occupants.has(body):
+		_exit_occupants.append(body)
+	_try_exit(require_key)
+
+## 兩名玩家都在門框內才換場。這裡不查 Area2D 的 get_overlapping_bodies() ——
+## 那個在 body_entered 發出的同一幀內不保證已經更新,所以自己維護佔用名單。
+func _try_exit(require_key: bool) -> void:
+	_update_exit_hint()
+	if _transitioning or not _exit_armed:
 		return
 	if require_key and not GameManager.has_key:
 		return
+	var players := get_tree().get_nodes_in_group("player")
+	if players.is_empty():
+		return
+	for player in players:
+		if not _exit_occupants.has(player):
+			return
 	go_to_next_level()
+
+## 有人站在出口、但人還沒到齊時給提示。沒有這個的話,一名玩家站在門口沒反應
+## 會被當成「換場壞掉」回報。
+func _update_exit_hint() -> void:
+	if not is_instance_valid(_exit_hint):
+		return
+	var total := get_tree().get_nodes_in_group("player").size()
+	_exit_hint.visible = _exit_occupants.size() > 0 and _exit_occupants.size() < total
